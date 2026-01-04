@@ -1,0 +1,460 @@
+Codex Plan
+
+Author
+Ananya and Hardik
+
+Paper Topic
+Semantics: Lexical and Sentence-Level
+
+Vision
+When watching dance, AI generates closed captions of the meaning based on semantic analysis of the movements.
+
+Goal 1
+Recognize 2 different meanings (Courage vs. Steadiness). 
+
+Tools
+https://ai.google.dev/edge/mediapipe/solutions/vision/hand_landmarker/web_js
+
+
+Plan
+
+
+# **Today's Build Plan: Mushti Motion Classifier**
+
+Perfect - let's build this as a **pure web app** (no Python needed for deployment).
+
+---
+
+## **Architecture Overview**
+
+```
+┌─────────────────────────────────────────┐
+│  Frontend (HTML + Vanilla JS)           │
+│  ├─ Webcam feed (video element)         │
+│  ├─ MediaPipe Hand Landmarker           │
+│  └─ Action log display                  │
+└─────────────────────────────────────────┘
+         ↓
+┌─────────────────────────────────────────┐
+│  Real-time Processing Loop              │
+│  1. Capture frame from webcam           │
+│  2. Extract hand landmarks (42 coords)  │
+│  3. Track trajectory over time          │
+│  4. Classify: Steadiness vs Courage     │
+│  5. Log action with timestamp           │
+└─────────────────────────────────────────┘
+```
+
+---
+
+## **Phase Breakdown for Today**
+
+### **Phase 1: Basic Webcam + Hand Tracking (1-2 hours)**
+**Goal:** See your hands with landmark dots overlaid
+
+**Files:**
+```
+mushti-classifier/
+├── index.html
+├── app.js
+├── classifier.js
+└── style.css
+```
+
+**Key Components:**
+- MediaPipe HandLandmarker initialization
+- Webcam access via `navigator.mediaDevices.getUserMedia()`
+- Canvas overlay to draw landmarks
+- FPS display to ensure smooth tracking
+
+**Success Check:** You see 21 blue dots on your hand in real-time
+
+---
+
+### **Phase 2: Motion Detection Logic (1-2 hours)**
+**Goal:** Detect when motion starts/stops and capture trajectory
+
+**Logic:**
+```javascript
+// Track wrist position (landmark 0) over rolling window
+const trajectoryBuffer = []; // Last 30 frames (~1 second at 30fps)
+
+function detectMotion(currentLandmarks) {
+  const wristY = currentLandmarks[0].y;
+  
+  trajectoryBuffer.push(wristY);
+  if (trajectoryBuffer.length > 30) trajectoryBuffer.shift();
+  
+  // Motion detected if displacement > threshold
+  const netMovement = trajectoryBuffer[0] - trajectoryBuffer[trajectoryBuffer.length - 1];
+  
+  if (Math.abs(netMovement) > 0.1) { // 10% of screen height
+    return classifyMotion(netMovement);
+  }
+  return null;
+}
+
+function classifyMotion(displacement) {
+  // Positive Y = downward in screen coords
+  if (displacement > 0.05) return "STEADINESS";
+  if (displacement < -0.05) return "COURAGE";
+  return null;
+}
+```
+
+**Success Check:** Console logs "STEADINESS" or "COURAGE" when you move
+
+---
+
+### **Phase 3: Action Log UI (30 min)**
+**Goal:** Display timestamped actions on screen
+
+**HTML Structure:**
+```html
+<div class="container">
+  <div class="video-section">
+    <video id="webcam" autoplay></video>
+    <canvas id="overlay"></canvas>
+  </div>
+  
+  <div class="log-section">
+    <h2>Action Log</h2>
+    <div id="action-log">
+      <!-- Dynamic entries like: -->
+      <!-- [14:23:45] COURAGE (confidence: 0.89) -->
+    </div>
+  </div>
+</div>
+```
+
+**Success Check:** Actions appear in log with timestamps as you perform them
+
+---
+
+### **Phase 4: Polish & Deployment (30 min)**
+**Features to Add:**
+- Confidence score (based on motion magnitude)
+- Visual feedback (screen flash green/blue on detection)
+- Clear log button
+- Mushti detection validation (warn if fist not closed)
+
+**GitHub Pages Deployment:**
+```bash
+# In your repo:
+git add .
+git commit -m "Initial mushti classifier"
+git push origin main
+
+# Enable GitHub Pages:
+# Settings → Pages → Source: main branch → Save
+# Site live at: https://yourusername.github.io/mushti-classifier/
+```
+
+---
+
+## **Starter Code Template**
+
+### **index.html**
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mushti Motion Classifier</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest"></script>
+</head>
+<body>
+  <div class="container">
+    <div class="video-section">
+      <video id="webcam" autoplay playsinline></video>
+      <canvas id="overlay"></canvas>
+      <div id="status">Initializing...</div>
+    </div>
+    
+    <div class="log-section">
+      <div class="log-header">
+        <h2>Action Log</h2>
+        <button id="clear-log">Clear</button>
+      </div>
+      <div id="action-log"></div>
+    </div>
+  </div>
+  
+  <script type="module" src="app.js"></script>
+</body>
+</html>
+```
+
+---
+
+### **app.js** (Skeleton)
+```javascript
+import { HandLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest";
+
+let handLandmarker;
+let video, canvas, ctx;
+let lastMotion = null;
+let trajectoryBuffer = [];
+
+// Initialize MediaPipe
+async function initHandLandmarker() {
+  const vision = await FilesetResolver.forVisionTasks(
+    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
+  );
+  
+  handLandmarker = await HandLandmarker.createFromOptions(vision, {
+    baseOptions: {
+      modelAssetPath: "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/latest/hand_landmarker.task",
+      delegate: "GPU"
+    },
+    numHands: 1, // Track only dominant hand
+    runningMode: "VIDEO"
+  });
+  
+  console.log("✅ HandLandmarker initialized");
+}
+
+// Start webcam
+async function startWebcam() {
+  video = document.getElementById('webcam');
+  canvas = document.getElementById('overlay');
+  ctx = canvas.getContext('2d');
+  
+  const stream = await navigator.mediaDevices.getUserMedia({ 
+    video: { width: 640, height: 480 } 
+  });
+  
+  video.srcObject = stream;
+  video.addEventListener('loadeddata', () => {
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    detectHands();
+  });
+}
+
+// Main detection loop
+function detectHands() {
+  const results = handLandmarker.detectForVideo(video, performance.now());
+  
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  if (results.landmarks && results.landmarks.length > 0) {
+    const landmarks = results.landmarks[0];
+    
+    // Draw landmarks
+    drawLandmarks(landmarks);
+    
+    // Classify motion
+    const motion = classifyMotion(landmarks);
+    if (motion && motion !== lastMotion) {
+      logAction(motion);
+      lastMotion = motion;
+    }
+  }
+  
+  requestAnimationFrame(detectHands);
+}
+
+function drawLandmarks(landmarks) {
+  landmarks.forEach(lm => {
+    ctx.beginPath();
+    ctx.arc(lm.x * canvas.width, lm.y * canvas.height, 5, 0, 2 * Math.PI);
+    ctx.fillStyle = '#00FF00';
+    ctx.fill();
+  });
+}
+
+function classifyMotion(landmarks) {
+  const wristY = landmarks[0].y; // Wrist landmark
+  
+  trajectoryBuffer.push({ y: wristY, time: Date.now() });
+  
+  // Keep last 1 second of data
+  trajectoryBuffer = trajectoryBuffer.filter(p => Date.now() - p.time < 1000);
+  
+  if (trajectoryBuffer.length < 20) return null; // Need minimum data
+  
+  const startY = trajectoryBuffer[0].y;
+  const endY = trajectoryBuffer[trajectoryBuffer.length - 1].y;
+  const displacement = endY - startY; // Positive = down, negative = up
+  
+  const threshold = 0.08; // 8% of screen height
+  
+  if (displacement > threshold) return "STEADINESS";
+  if (displacement < -threshold) return "COURAGE";
+  
+  return null;
+}
+
+function logAction(action) {
+  const log = document.getElementById('action-log');
+  const timestamp = new Date().toLocaleTimeString();
+  const entry = document.createElement('div');
+  entry.className = `log-entry ${action.toLowerCase()}`;
+  entry.textContent = `[${timestamp}] ${action}`;
+  log.prepend(entry);
+}
+
+// Initialize app
+(async () => {
+  document.getElementById('status').textContent = 'Loading model...';
+  await initHandLandmarker();
+  document.getElementById('status').textContent = 'Starting camera...';
+  await startWebcam();
+  document.getElementById('status').textContent = '✅ Ready';
+  
+  document.getElementById('clear-log').onclick = () => {
+    document.getElementById('action-log').innerHTML = '';
+  };
+})();
+```
+
+---
+
+### **style.css** (Basic Styling)
+```css
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: #1a1a1a;
+  color: #fff;
+  padding: 20px;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.video-section {
+  position: relative;
+  background: #000;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+#webcam {
+  width: 100%;
+  display: block;
+}
+
+#overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+#status {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(0,0,0,0.7);
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.log-section {
+  background: #2a2a2a;
+  border-radius: 12px;
+  padding: 20px;
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.log-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+#clear-log {
+  background: #ff4444;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+}
+
+.log-entry {
+  padding: 10px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+  font-family: 'Courier New', monospace;
+}
+
+.log-entry.steadiness {
+  background: linear-gradient(90deg, #1e3a5f, #2a2a2a);
+  border-left: 4px solid #4a90e2;
+}
+
+.log-entry.courage {
+  background: linear-gradient(90deg, #5f1e1e, #2a2a2a);
+  border-left: 4px solid #e24a4a;
+}
+```
+
+---
+
+## **Testing Checklist**
+
+### Localhost Testing
+```bash
+# Serve files (MediaPipe requires HTTPS/localhost)
+python -m http.server 8000
+# Or use VS Code Live Server extension
+
+# Open: http://localhost:8000
+```
+
+**Test Cases:**
+- [ ] Webcam activates and shows feed
+- [ ] Green dots appear on mushti fist
+- [ ] Moving hand down → "STEADINESS" logged
+- [ ] Moving hand up → "COURAGE" logged
+- [ ] No false positives when hand is still
+- [ ] Clear button works
+
+### GitHub Pages Testing
+- [ ] Push to repo, enable Pages
+- [ ] Test on phone (should work on mobile)
+- [ ] Share link with friend to validate
+
+---
+
+## **Working with Codex Tips**
+
+When prompting Codex/Claude Code for help:
+
+**Good prompts:**
+- "Add confidence score based on motion velocity"
+- "Debounce motion detection to avoid rapid repeated logs"
+- "Add visual flash effect when action is detected"
+- "Validate mushti shape - warn if fingers detected as extended"
+
+**Provide context:**
+- Share the current `app.js` code
+- Describe the specific issue (e.g., "too sensitive, logs every frame")
+- Request incremental changes, not full rewrites
+
+---
+
+## **Timeline for Today**
+
+```
+Hour 1-2:  Get MediaPipe working, see hand landmarks
+Hour 3:    Implement motion classification logic
+Hour 4:    Build action log UI
+Hour 5:    Polish, test, deploy to GitHub Pages
+```
+
+**End of day deliverable:** A shareable URL where anyone can test the classifier.
+
