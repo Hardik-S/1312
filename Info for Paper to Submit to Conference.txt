@@ -1,0 +1,103 @@
+Info for Paper to Submit to Conference (ACL / ARR)
+
+Overview
+- ACL uses ACL Rolling Review (ARR). You submit to ARR first (rolling review), then later commit the reviewed paper to a venue (ACL/NAACL/EMNLP/etc.) that accepts ARR reviews.
+- Reviews are not open, but everything runs on OpenReview.
+
+Critical policy changes
+- All authors must register as reviewers; failure to complete review duties can make authors ineligible to submit in a future ARR cycle.
+- After each submission deadline, all authors must complete the author registration form within 48 hours.
+- Responsible checklist fields remain editable for 48 hours after the deadline.
+
+Scope and topic selection
+- ARR welcomes all CL/NLP topics. You must choose a topic area at submission to match AC/reviewers.
+- Contribution types can be flagged (e.g., data resources, low-resource, interpretability, reproduction, surveys, etc.).
+
+Paper types and length limits
+- Long paper: up to 8 pages of main content.
+- Short paper: up to 4 pages of main content.
+- References are unlimited.
+- Limitations section is required and must be placed after the conclusion and before references. It does not count toward the page limit.
+- Optional Ethical Considerations section is recommended at the end of the paper.
+- Missing the Limitations section or exceeding page limits leads to desk rejection.
+
+Anonymity and submission rules (two-way anonymized review)
+- No author names, affiliations, or self-identifying statements.
+- Avoid self-references that reveal identity (use neutral citations).
+- Supplementary materials and links must also be anonymized.
+- Do not use file-hosting links that track downloads (Dropbox, etc.).
+
+Preprint policy
+- ARR allows preprints, but you must choose your preprint status during submission.
+- If you choose a binding “non-preprint” option, you must not preprint until the review cycle ends; violation can cause desk rejection.
+- Anonymous submission is incentivized by some venues for awards or borderline acceptances.
+
+Authorship
+- Include all and only people who made substantial contributions.
+- No author changes after submission.
+- Resubmissions require justification for any author changes (adds/removals).
+
+Citation and comparison
+- Cite all relevant refereed work.
+- Cite the refereed version when a preprint has been superseded.
+- Papers within 3 months of deadline are considered contemporaneous; deep comparison may be excused.
+
+Multiple submission policy
+- You cannot submit to ARR and any other venue (journal/conference) at the same time.
+- You cannot submit to ARR while a commitment to a conference is active, and vice versa.
+- Significant overlap with published or under-review work is not allowed.
+
+Resubmission policy
+- Resubmissions are allowed and must include a link to the prior submission.
+- Provide a summary of changes plus a point-by-point response to prior reviews.
+- Address all prior weaknesses; resubmitting unchanged work can be desk rejected.
+- You may request new reviewers/AC with justification.
+
+Withdrawal policy
+- You can withdraw at any time.
+- Withdrawal more than 48 hours after deadline may delay resubmission until the second subsequent ARR cycle.
+- Once you have reviews, you cannot withdraw and resubmit as a new paper; use the resubmission process instead.
+
+Ethics and Responsible NLP
+- You must comply with the ACL Code of Ethics.
+- Include a Limitations section; Ethical Considerations is recommended.
+- Complete the Responsible NLP Checklist in the submission form.
+- Incorrect or misleading checklist answers can cause desk rejection.
+
+AI writing/coding assistance policy
+- Generative AI tools do not qualify for authorship.
+- Use must be disclosed in the Responsible NLP Checklist and Acknowledgements (except for basic proofreading tools).
+- Authors remain responsible for correctness and must avoid plagiarism.
+
+Reviewing obligations
+- Submitting implies a reviewing obligation for all qualified authors.
+- Reviewers must keep profiles up to date on OpenReview.
+- Failure to review can lead to sanctions or future ineligibility.
+
+Submission process and formatting
+- Submit via OpenReview.
+- Use the official ACL template; do not modify the style files.
+- Follow ACL formatting rules (paper size, margins, font size).
+- Submissions with formatting or anonymity violations are desk rejected.
+
+Supplementary materials (optional)
+- Appendices, software, and data are allowed but must be anonymized.
+- Appendices go after references and should remain in double-column format.
+- Software and data should be uploaded as separate .zip or .tgz archives.
+- Reviewers are not required to consider appendices, so key content should stay in the main paper.
+
+Desk rejection risks (common)
+- Exceeding page limits or missing Limitations section.
+- Any identity leakage (authors, affiliations, self-identifying citations).
+- Dual submission or significant overlap with other publications.
+- Incorrect or incomplete Responsible NLP Checklist.
+- Formatting violations or modified template.
+
+Checklist before submission
+- Select the right topic area and contribution types.
+- Confirm page limits (long: 8, short: 4) and include Limitations section.
+- Ensure anonymity in paper and supplements; avoid tracked links.
+- Confirm no dual submission or overlapping publication.
+- Use ACL template and verify formatting.
+- Prepare Responsible NLP Checklist and AI assistance disclosure.
+- Ensure all authors will register and can fulfill reviewing duties.

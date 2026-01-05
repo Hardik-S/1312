@@ -1,0 +1,9 @@
+1) Replaced hover-only metric info with a dedicated info panel fed by requirements-info.json.
+2) Added show/hide toggles for the info panel, including a header-level Show Info button.
+3) Introduced movements.json to define motion requirements and wired it into the classifier.
+4) Made label-direction mapping configurable via movements.json.
+5) Added a Live Controls panel with sliders for thresholds/timing, later moved to the top and compacted.
+6) Added a camera Stop/Start control and ensured restart reinitializes tracking.
+7) Added per-finger curl sliders with defaults stored in mushti-requirements.json.
+8) Implemented localStorage persistence plus a Saved indicator and a Reset to JSON button.
+9) Clarified thumb curl logic with an inline comment.

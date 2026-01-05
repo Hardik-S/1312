@@ -1,0 +1,23 @@
+This project builds a browser-based hand-motion classifier UI around a Mushti (fist) detector and a steadiness vs courage motion classifier. The work adds structure, discoverability, configurability, and operator controls so the system can be tuned quickly while running on a webcam stream.
+
+We added a right-side information panel so the metric explanations are always visible without hover. This removes the discoverability problem of tooltips and ensures every measurement is understandable at a glance. The panel is populated from requirements-info.json so the copy can be edited without touching code.
+
+To keep the interface flexible, we added show/hide controls for the info panel. There is a toggle inside the panel and a separate Show Info button next to the status pill, so the panel can be restored even when hidden. This preserves screen space while keeping the feature accessible.
+
+We created movements.json to house motion requirements such as buffer window, minimum samples, displacement threshold, and cooldown. Wiring the classifier to read this JSON makes the detection thresholds editable without code changes.
+
+We exposed the motion label mapping in the classifier, so the direction-to-label decision can be driven by movements.json. This enables experimentation with what counts as steadiness vs courage without editing the classifier logic directly.
+
+We added a top-of-page Live Controls panel with sliders to tune the main thresholds and timing parameters. These sliders are a runtime control surface for experimentation, so you can refine sensitivity immediately while the camera is running.
+
+We expanded curl sensitivity controls by adding per-finger curl sliders. This acknowledges that each finger can curl differently, and provides a way to loosen strict fingers without changing the global threshold. The per-finger values live in mushti-requirements.json under fingerThresholds, and they are used during evaluation if present.
+
+We added a Saved indicator to the controls area so you get immediate feedback that changes were persisted. This is paired with localStorage persistence, so slider adjustments survive refreshes even though the browser cannot write the JSON files directly.
+
+We added a Reset to JSON button to restore the live controls to the values defined in mushti-requirements.json and movements.json. This provides a quick way to return to a known baseline without clearing storage manually.
+
+We added camera controls (Stop/Start) so the camera can be paused without reloading. When the camera restarts, the tracking service is also reinitialized to ensure hand detection resumes cleanly after a stop.
+
+We kept the UI compact by making the controls smaller and arranging them in a two-row grid at the top. This preserves space for the video, metrics, and log while still exposing all configuration inputs.
+
+Finally, we documented the thumb curl rule inline to clarify the logic: thumb curl is determined by the ratio of tip-to-wrist distance over MCP-to-wrist distance being below a threshold. This makes it clear why the thumb may be evaluated as not curled when the ratio is above the threshold.
