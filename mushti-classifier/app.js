@@ -17,6 +17,7 @@ const clearButton = document.getElementById("clear-log");
 const mushtiIndicator = document.getElementById("mushti-indicator");
 const metricsEl = document.getElementById("mushti-metrics");
 const metricsInfoEl = document.getElementById("metrics-info");
+const feedbackEl = document.getElementById("mushti-feedback");
 const infoPanelToggle = document.getElementById("info-panel-toggle");
 const infoPanelShow = document.getElementById("info-panel-show");
 const infoCard = document.querySelector(".info-card");
@@ -205,26 +206,31 @@ function evaluateMushti(landmarks) {
       name,
       ratio,
       delta,
-      curled: curledFinger
+      curled: curledFinger,
+      threshold: fingerThreshold
     };
   });
 
   const thumbConfig = mushtiRequirements.thumb;
   let thumbMetric = null;
   if (thumbConfig) {
-    // Thumb is considered curled when tip-to-wrist is shorter than MCP-to-wrist (below threshold ratio).
-    const thumbThreshold = thumbConfig.threshold ?? threshold;
-    const tipDist = distance(landmarks[thumbConfig.tipIndex], wrist);
-    const mcpDist = distance(landmarks[thumbConfig.mcpIndex], wrist);
-    const ratio = tipDist / mcpDist;
-    const delta = ratio - thumbThreshold;
-    const curledThumb = ratio < thumbThreshold;
+    // Thumb is considered curled when the tip is within a threshold of any finger MCP.
+    const thumbThreshold = thumbConfig.threshold ?? 0.08;
+    const thumbTip = landmarks[thumbConfig.tipIndex];
+    const mcpIndices = fingerPairs.map((finger) => finger.mcpIndex);
+    const touchDistance = mcpIndices.length
+      ? Math.min(
+          ...mcpIndices.map((index) => distance(thumbTip, landmarks[index]))
+        )
+      : distance(thumbTip, wrist);
+    const delta = touchDistance - thumbThreshold;
+    const curledThumb = touchDistance <= thumbThreshold;
     if (curledThumb) {
       curled += 1;
     }
     thumbMetric = {
       name: "Thumb",
-      ratio,
+      touchDistance,
       delta,
       curled: curledThumb,
       threshold: thumbThreshold
@@ -237,7 +243,8 @@ function evaluateMushti(landmarks) {
     metrics,
     threshold,
     requiredCurled,
-    thumbMetric
+    thumbMetric,
+    curledCount: curled
   };
 }
 
@@ -273,9 +280,9 @@ function renderMetrics(
     mushtiLines.unshift(
       metricLine(
         thumbMetric.name,
-        `${offText} (${thumbMetric.ratio.toFixed(2)} / ${thumbMetric.threshold.toFixed(
-          2
-        )})`,
+        `${offText} (${thumbMetric.touchDistance.toFixed(
+          3
+        )} / ${thumbMetric.threshold.toFixed(3)})`,
         "thumbRatio"
       )
     );
@@ -340,6 +347,55 @@ function renderMetrics(
   ].join("");
 }
 
+function renderMushtiFeedback(mushtiEval) {
+  if (!feedbackEl) return;
+  if (!mushtiEval) {
+    feedbackEl.innerHTML = "<ul><li>Place your hand in frame to start.</li></ul>";
+    return;
+  }
+
+  const items = [];
+
+  const addItem = (label, progress) => {
+    const status =
+      progress >= 1 ? "is-met" : progress >= 0.8 ? "is-close" : "";
+    items.push({ label, status });
+  };
+
+  const required = mushtiEval.requiredCurled ?? 0;
+  const curledCount = mushtiEval.curledCount ?? 0;
+  const countProgress = required > 0 ? curledCount / required : 0;
+  addItem(`Curl ${required} fingers (now ${curledCount}).`, countProgress);
+
+  (mushtiEval.metrics || []).forEach((metric) => {
+    const progress = metric.ratio > 0 ? metric.threshold / metric.ratio : 0;
+    addItem(
+      `Curl ${metric.name.toLowerCase()} finger.`,
+      metric.curled ? 1 : progress
+    );
+  });
+
+  if (mushtiEval.thumbMetric) {
+    const progress =
+      mushtiEval.thumbMetric.touchDistance > 0
+        ? mushtiEval.thumbMetric.threshold / mushtiEval.thumbMetric.touchDistance
+        : 0;
+    addItem(
+      "Touch thumb tip to a finger knuckle.",
+      mushtiEval.thumbMetric.curled ? 1 : progress
+    );
+  }
+
+  const listItems = items
+    .map(
+      (item) =>
+        `<li class="${item.status}">${item.label}</li>`
+    )
+    .join("");
+
+  feedbackEl.innerHTML = `<ul>${listItems}</ul>`;
+}
+
 function renderMetricsInfo() {
   if (!metricsInfoEl) return;
   if (!requirementsInfo) {
@@ -363,7 +419,7 @@ function renderMetricsInfo() {
   }
 
   if (mushtiRequirements && mushtiRequirements.thumb) {
-    items.push({ label: "Thumb Ratio", key: "thumbRatio" });
+    items.push({ label: "Thumb Touch", key: "thumbRatio" });
   }
 
   items.push(
@@ -538,15 +594,15 @@ function getControlsConfig() {
   controls.push(
     {
       id: "thumb-threshold",
-      label: "Thumb Curl Threshold",
+      label: "Thumb Touch Threshold",
       group: "mushti-thumb",
       key: "threshold",
-      min: 0.7,
-      max: 1.2,
-      step: 0.01,
-      format: "ratio",
+      min: 0.01,
+      max: 0.2,
+      step: 0.005,
+      format: "threshold",
       value:
-        (mushtiRequirements.thumb && mushtiRequirements.thumb.threshold) ?? 0.95
+        (mushtiRequirements.thumb && mushtiRequirements.thumb.threshold) ?? 0.08
     },
     {
       id: "required-curled",
@@ -815,6 +871,7 @@ function detectHands() {
         mushtiEval.requiredCurled,
         mushtiEval.thumbMetric
       );
+      renderMushtiFeedback(mushtiEval);
     } else {
       ctx.clearRect(0, 0, displayWidth, displayHeight);
       classifier.reset();
@@ -826,6 +883,7 @@ function detectHands() {
         null,
         null
       );
+      renderMushtiFeedback(null);
     }
   }
 

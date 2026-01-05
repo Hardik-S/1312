@@ -457,6 +457,39 @@ h1 {
   margin-bottom: 16px;
 }
 
+.feedback {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: var(--bg-accent);
+  font-size: 13px;
+  color: var(--ink);
+  margin-top: 10px;
+  display: grid;
+  gap: 6px;
+}
+
+.feedback ul {
+  padding-left: 16px;
+  color: var(--muted);
+  display: grid;
+  gap: 4px;
+}
+
+.feedback li {
+  list-style: disc;
+}
+
+.feedback li.is-met {
+  color: #2f5f3d;
+  font-weight: 600;
+}
+
+.feedback li.is-close {
+  color: #b7860b;
+  font-weight: 600;
+}
+
 .metrics .metric {
   display: flex;
   justify-content: space-between;

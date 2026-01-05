@@ -10,7 +10,7 @@
   "thumb": {
     "tipIndex": 4,
     "mcpIndex": 2,
-    "threshold": 0.95
+    "threshold": 0.08
   },
   "fingers": [
     { "name": "Index", "tipIndex": 8, "mcpIndex": 5 },

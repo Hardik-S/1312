@@ -2,7 +2,7 @@
   "mushtiThreshold": "The max wrist-to-tip distance ratio for a curled finger. Lower means more curled.",
   "requiredCurled": "How many fingers (including thumb) must be curled to count as Mushti.",
   "fingerRatio": "Finger ratio = distance(wrist->tip) / distance(wrist->MCP). Below threshold means curled.",
-  "thumbRatio": "Thumb ratio = distance(wrist->thumb tip) / distance(wrist->thumb MCP).",
+  "thumbRatio": "Thumb curl = distance(thumb tip -> any finger MCP). Below threshold means curled.",
   "motionWindow": "Time window (ms) used to measure net wrist movement.",
   "samples": "How many recent frames are in the motion buffer vs the minimum needed.",
   "displacement": "Net wrist Y movement over the window. Down = steadiness, up = courage.",

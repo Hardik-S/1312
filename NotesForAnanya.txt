@@ -1,0 +1,4 @@
+How to write the report?
+
+- consider downloading entire git repository as a .zip file and work with codex after extracting it
+- consider writing bullet points for each section of the report and then having AI iterate on it
