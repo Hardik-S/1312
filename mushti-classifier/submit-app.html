@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ACL Submission Console</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="page">
+      <a class="nav-link" href="index.html">Back to Classifier</a>
+      <header class="header">
+        <div>
+          <p class="eyebrow">ACL Rolling Review</p>
+          <h1>Submission Console + Live Demo</h1>
+        </div>
+        <div class="header-actions">
+          <button id="info-panel-show" type="button" aria-pressed="false">
+            Show Info
+          </button>
+          <button id="camera-toggle" type="button" aria-pressed="true">
+            Stop Camera
+          </button>
+          <div class="status" id="status">Initializing...</div>
+        </div>
+      </header>
+
+      <section class="controls-card">
+        <div class="controls-header">
+          <div>
+            <h2>Live Controls</h2>
+            <p>Adjust thresholds and timing to tune detections.</p>
+          </div>
+          <div class="controls-actions">
+            <span id="controls-saved" class="controls-saved">Saved</span>
+            <button id="controls-reset" type="button">Reset to JSON</button>
+          </div>
+        </div>
+        <div id="controls" class="controls-grid"></div>
+      </section>
+
+      <section class="submission-grid">
+        <article class="submission-card">
+          <div class="submission-header">
+            <h2>Submission Readiness</h2>
+            <div class="progress">
+              <div class="progress-track">
+                <div id="readiness-progress" class="progress-fill"></div>
+              </div>
+              <span id="readiness-label" class="progress-label">0%</span>
+            </div>
+          </div>
+          <div class="checklist" data-section="readiness">
+            <label class="checklist-item">
+              <input type="checkbox" id="chk-limitations" />
+              <span>Limitations section added after conclusion</span>
+            </label>
+            <label class="checklist-item">
+              <input type="checkbox" id="chk-template" />
+              <span>ACL template + formatting rules verified</span>
+            </label>
+            <label class="checklist-item">
+              <input type="checkbox" id="chk-anonymity" />
+              <span>Two-way anonymity confirmed (paper + supplements)</span>
+            </label>
+            <label class="checklist-item">
+              <input type="checkbox" id="chk-dual" />
+              <span>No dual submission or overlapping publication</span>
+            </label>
+            <label class="checklist-item">
+              <input type="checkbox" id="chk-responsible" />
+              <span>Responsible NLP checklist ready</span>
+            </label>
+            <label class="checklist-item">
+              <input type="checkbox" id="chk-authors" />
+              <span>Author list final + all authors notified</span>
+            </label>
+            <label class="checklist-item">
+              <input type="checkbox" id="chk-review" />
+              <span>All authors ready for review duty + registration</span>
+            </label>
+            <label class="checklist-item">
+              <input type="checkbox" id="chk-preprint" />
+              <span>Preprint status chosen (binding/non-binding)</span>
+            </label>
+          </div>
+        </article>
+
+        <article class="submission-card">
+          <h2>Paper Metadata</h2>
+          <div class="form-grid">
+            <label class="form-field">
+              <span>Title</span>
+              <input id="meta-title" type="text" placeholder="Paper title" />
+            </label>
+            <label class="form-field">
+              <span>Paper Type</span>
+              <select id="meta-type">
+                <option value="long">Long (8 pages)</option>
+                <option value="short">Short (4 pages)</option>
+              </select>
+            </label>
+            <label class="form-field">
+              <span>Primary Area</span>
+              <select id="meta-area">
+                <option value="">Select area</option>
+                <option>Human-centered NLP</option>
+                <option>Multimodality</option>
+                <option>Machine Learning for NLP</option>
+                <option>Interpretability and Analysis of Models for NLP</option>
+                <option>NLP Applications</option>
+                <option>Resources and Evaluation</option>
+                <option>Theme Track</option>
+              </select>
+            </label>
+            <label class="form-field">
+              <span>ARR Cycle Deadline</span>
+              <input id="meta-deadline" type="date" />
+            </label>
+            <label class="form-field">
+              <span>Commitment Venue</span>
+              <input id="meta-venue" type="text" placeholder="ACL / NAACL / EMNLP" />
+            </label>
+            <label class="form-field">
+              <span>Preprint Status</span>
+              <select id="meta-preprint">
+                <option value="anonymous">Anonymous submission (recommended)</option>
+                <option value="nonbinding">Non-binding preprint allowed</option>
+                <option value="binding">Binding non-preprint (no posting)</option>
+              </select>
+            </label>
+          </div>
+          <div class="tag-group">
+            <span>Contribution Types</span>
+            <label><input type="checkbox" id="contrib-resource" /> Data resources</label>
+            <label><input type="checkbox" id="contrib-analysis" /> Analysis / interpretability</label>
+            <label><input type="checkbox" id="contrib-engineering" /> NLP engineering</label>
+            <label><input type="checkbox" id="contrib-lowresource" /> Low-resource / efficiency</label>
+            <label><input type="checkbox" id="contrib-application" /> NLP application</label>
+            <label><input type="checkbox" id="contrib-reproduction" /> Reproduction / negative result</label>
+          </div>
+        </article>
+
+        <article class="submission-card">
+          <h2>Responsible NLP + AI Use</h2>
+          <div class="form-grid">
+            <label class="form-field">
+              <span>Ethical Considerations</span>
+              <textarea
+                id="meta-ethics"
+                placeholder="Summarize ethical considerations to include."
+              ></textarea>
+            </label>
+            <label class="form-field">
+              <span>AI Assistance Disclosure</span>
+              <textarea
+                id="meta-ai"
+                placeholder="Note any generative tools used for writing, coding, or literature search."
+              ></textarea>
+            </label>
+          </div>
+          <div class="callout">
+            All authors remain responsible for correctness and must disclose AI assistance in the Responsible NLP checklist and acknowledgements.
+          </div>
+        </article>
+
+        <article class="submission-card">
+          <h2>Artifacts + Supplements</h2>
+          <div class="checklist" data-section="artifacts">
+            <label class="checklist-item">
+              <input type="checkbox" id="art-paper" />
+              <span>Paper PDF ready (ACL template, anonymized)</span>
+            </label>
+            <label class="checklist-item">
+              <input type="checkbox" id="art-appendix" />
+              <span>Appendix in double-column format</span>
+            </label>
+            <label class="checklist-item">
+              <input type="checkbox" id="art-code" />
+              <span>Anonymous code repo / zip prepared</span>
+            </label>
+            <label class="checklist-item">
+              <input type="checkbox" id="art-data" />
+              <span>Anonymous data archive prepared</span>
+            </label>
+            <label class="checklist-item">
+              <input type="checkbox" id="art-checklist" />
+              <span>Responsible NLP checklist entries complete</span>
+            </label>
+          </div>
+          <label class="form-field">
+            <span>Anonymous Repository Link</span>
+            <input id="meta-repo" type="text" placeholder="https://anonymous.4open.science/..." />
+          </label>
+        </article>
+
+        <article class="submission-card">
+          <h2>Timeline</h2>
+          <div class="timeline">
+            <label>
+              Draft complete
+              <input id="timeline-draft" type="date" />
+            </label>
+            <label>
+              Internal review
+              <input id="timeline-review" type="date" />
+            </label>
+            <label>
+              ARR submission
+              <input id="timeline-submit" type="date" />
+            </label>
+            <label>
+              Author registration (48h)
+              <input id="timeline-register" type="date" />
+            </label>
+          </div>
+          <div class="actions">
+            <button id="copy-summary" type="button">Copy Submission Summary</button>
+          </div>
+        </article>
+
+        <article class="submission-card">
+          <h2>Desk Rejection Risks</h2>
+          <ul class="risk-list">
+            <li>Missing Limitations section or page limit violations.</li>
+            <li>Anonymity leaks in paper or supplemental materials.</li>
+            <li>Dual submission or overlapping publication.</li>
+            <li>Incorrect Responsible NLP checklist entries.</li>
+            <li>Formatting changes to ACL style files.</li>
+          </ul>
+        </article>
+      </section>
+
+      <section class="content">
+        <div class="video-card">
+          <div class="video-frame">
+            <video id="webcam" autoplay playsinline></video>
+            <canvas id="overlay"></canvas>
+          </div>
+          <div class="hint">
+            Hold your fist in frame, then move up or down to trigger a label.
+          </div>
+        </div>
+
+        <aside class="log-card">
+          <div class="indicator-row">
+            <div class="indicator">
+              <span class="label">Mushti</span>
+              <span id="mushti-indicator" class="pill no">No</span>
+            </div>
+          </div>
+          <div id="mushti-metrics" class="metrics"></div>
+          <div class="log-header">
+            <h2>Action Log</h2>
+            <button id="clear-log" type="button">Clear</button>
+          </div>
+          <div class="log-body" id="action-log"></div>
+        </aside>
+
+        <aside class="info-card">
+          <div class="info-header">
+            <h2>Metric Info</h2>
+            <button id="info-panel-toggle" type="button" aria-pressed="true">
+              Hide
+            </button>
+          </div>
+          <div id="metrics-info" class="info-list"></div>
+        </aside>
+      </section>
+    </main>
+
+    <script type="module" src="app.js"></script>
+    <script type="module" src="submit-app.js"></script>
+  </body>
+</html>
