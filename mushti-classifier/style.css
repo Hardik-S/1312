@@ -1,0 +1,246 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  color-scheme: light;
+  --bg: #f4f1eb;
+  --bg-accent: #f9f6f0;
+  --ink: #1f1f1f;
+  --muted: #5f5c57;
+  --card: #ffffff;
+  --accent: #1f8077;
+  --accent-2: #a44a3f;
+  --border: rgba(31, 31, 31, 0.12);
+  --shadow: 0 18px 45px rgba(20, 20, 20, 0.12);
+}
+
+body {
+  font-family: "Manrope", sans-serif;
+  background: radial-gradient(circle at top left, #fdfaf5 0%, #f4f1eb 55%, #efe8de 100%);
+  color: var(--ink);
+  min-height: 100vh;
+  padding: 32px;
+}
+
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+h1 {
+  font-size: clamp(28px, 3vw, 40px);
+  font-weight: 700;
+}
+
+.status {
+  padding: 10px 18px;
+  background: var(--card);
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+}
+
+.video-card,
+.log-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: var(--shadow);
+  position: relative;
+}
+
+.video-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.video-frame {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+#webcam {
+  width: 100%;
+  display: block;
+}
+
+.hint {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.log-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 320px;
+}
+
+.indicator-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px dashed var(--border);
+  background: var(--bg-accent);
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.metrics .metric {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-family: "Courier New", monospace;
+}
+
+.indicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.indicator .label {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 11px;
+}
+
+.pill {
+  background: var(--bg-accent);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.pill.yes {
+  background: rgba(31, 128, 119, 0.12);
+  border-color: rgba(31, 128, 119, 0.4);
+  color: var(--accent);
+}
+
+.pill.no {
+  background: rgba(164, 74, 63, 0.12);
+  border-color: rgba(164, 74, 63, 0.4);
+  color: var(--accent-2);
+}
+
+.log-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.log-header h2 {
+  font-size: 20px;
+}
+
+#clear-log {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+#clear-log:hover {
+  background: #17675f;
+}
+
+.log-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+}
+
+.log-entry {
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-family: "Courier New", monospace;
+  font-size: 14px;
+  border: 1px solid var(--border);
+  background: var(--bg-accent);
+}
+
+.log-entry.steadiness {
+  border-left: 4px solid var(--accent);
+}
+
+.log-entry.courage {
+  border-left: 4px solid var(--accent-2);
+}
+
+@media (max-width: 900px) {
+  body {
+    padding: 20px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .content {
+    grid-template-columns: 1fr;
+  }
+
+  #overlay {
+    inset: 16px;
+  }
+}

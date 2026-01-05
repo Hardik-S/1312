@@ -1,0 +1,15 @@
+{
+  "fingerThreshold": 0.92,
+  "requiredCurledFingers": 4,
+  "thumb": {
+    "tipIndex": 4,
+    "mcpIndex": 2,
+    "threshold": 0.95
+  },
+  "fingers": [
+    { "name": "Index", "tipIndex": 8, "mcpIndex": 5 },
+    { "name": "Middle", "tipIndex": 12, "mcpIndex": 9 },
+    { "name": "Ring", "tipIndex": 16, "mcpIndex": 13 },
+    { "name": "Pinky", "tipIndex": 20, "mcpIndex": 17 }
+  ]
+}

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mushti Motion Classifier</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="header">
+        <div>
+          <p class="eyebrow">Mushti Motion Classifier</p>
+          <h1>Detect Steadiness vs Courage</h1>
+        </div>
+        <div class="status" id="status">Initializing...</div>
+      </header>
+
+      <section class="content">
+        <div class="video-card">
+          <div class="video-frame">
+            <video id="webcam" autoplay playsinline></video>
+            <canvas id="overlay"></canvas>
+          </div>
+          <div class="hint">
+            Hold your fist in frame, then move up or down to trigger a label.
+          </div>
+        </div>
+
+        <aside class="log-card">
+          <div class="indicator-row">
+            <div class="indicator">
+              <span class="label">Mushti</span>
+              <span id="mushti-indicator" class="pill no">No</span>
+            </div>
+          </div>
+          <div id="mushti-metrics" class="metrics"></div>
+          <div class="log-header">
+            <h2>Action Log</h2>
+            <button id="clear-log" type="button">Clear</button>
+          </div>
+          <div class="log-body" id="action-log"></div>
+        </aside>
+      </section>
+    </main>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
