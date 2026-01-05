@@ -1,5 +1,11 @@
 {
   "fingerThreshold": 0.92,
+  "fingerThresholds": {
+    "Index": 0.92,
+    "Middle": 0.92,
+    "Ring": 0.92,
+    "Pinky": 0.92
+  },
   "requiredCurledFingers": 4,
   "thumb": {
     "tipIndex": 4,

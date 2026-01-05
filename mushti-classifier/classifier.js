@@ -2,7 +2,17 @@ const DEFAULT_CONFIG = {
   bufferMs: 1000,
   minSamples: 20,
   displacementThreshold: 0.08,
-  cooldownMs: 2000
+  cooldownMs: 2000,
+  labels: {
+    steadiness: {
+      displacementSign: "positive",
+      label: "STEADINESS"
+    },
+    courage: {
+      displacementSign: "negative",
+      label: "COURAGE"
+    }
+  }
 };
 
 export function createMotionClassifier(config = {}) {
@@ -29,7 +39,25 @@ export function createMotionClassifier(config = {}) {
 
     if (magnitude < settings.displacementThreshold) return null;
 
-    const label = displacement > 0 ? "STEADINESS" : "COURAGE";
+    const positiveLabel =
+      settings.labels?.steadiness?.label || DEFAULT_CONFIG.labels.steadiness.label;
+    const negativeLabel =
+      settings.labels?.courage?.label || DEFAULT_CONFIG.labels.courage.label;
+    const positiveSign =
+      settings.labels?.steadiness?.displacementSign ||
+      DEFAULT_CONFIG.labels.steadiness.displacementSign;
+    const negativeSign =
+      settings.labels?.courage?.displacementSign ||
+      DEFAULT_CONFIG.labels.courage.displacementSign;
+
+    const positiveMeansUp = positiveSign === "negative";
+    const label = displacement > 0
+      ? positiveMeansUp
+        ? negativeLabel
+        : positiveLabel
+      : positiveMeansUp
+        ? positiveLabel
+        : negativeLabel;
     if (label === lastLabel && nowMs - lastFiredAt < settings.cooldownMs * 1.5) {
       return null;
     }

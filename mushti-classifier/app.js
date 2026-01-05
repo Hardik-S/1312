@@ -16,15 +16,33 @@ const logEl = document.getElementById("action-log");
 const clearButton = document.getElementById("clear-log");
 const mushtiIndicator = document.getElementById("mushti-indicator");
 const metricsEl = document.getElementById("mushti-metrics");
+const metricsInfoEl = document.getElementById("metrics-info");
+const infoPanelToggle = document.getElementById("info-panel-toggle");
+const infoPanelShow = document.getElementById("info-panel-show");
+const infoCard = document.querySelector(".info-card");
+const contentEl = document.querySelector(".content");
+const controlsEl = document.getElementById("controls");
+const resetControlsButton = document.getElementById("controls-reset");
+const cameraToggle = document.getElementById("camera-toggle");
+const controlsSavedEl = document.getElementById("controls-saved");
 
 const ctx = canvasEl.getContext("2d");
-const classifier = createMotionClassifier();
+let classifier = null;
 
 let handLandmarker = null;
 let lastVideoTime = -1;
 let displayWidth = 0;
 let displayHeight = 0;
 let mushtiRequirements = null;
+let requirementsInfo = null;
+let movementRequirements = null;
+let defaultMushtiRequirements = null;
+let defaultMovementRequirements = null;
+let cameraStream = null;
+let cameraActive = false;
+let savedTimeout = null;
+
+const STORAGE_KEY = "mushti-controls-v1";
 
 const HAND_CONNECTIONS = [
   [0, 1],
@@ -66,6 +84,8 @@ async function startWebcam() {
   const stream = await navigator.mediaDevices.getUserMedia({
     video: { width: 640, height: 480 }
   });
+  cameraStream = stream;
+  cameraActive = true;
   videoEl.srcObject = stream;
 
   await new Promise((resolve) => {
@@ -73,6 +93,19 @@ async function startWebcam() {
   });
 
   resizeCanvasToVideo();
+}
+
+function stopWebcam() {
+  if (cameraStream) {
+    cameraStream.getTracks().forEach((track) => track.stop());
+  }
+  cameraStream = null;
+  cameraActive = false;
+  videoEl.srcObject = null;
+  ctx.clearRect(0, 0, displayWidth, displayHeight);
+  if (classifier) {
+    classifier.reset();
+  }
 }
 
 function resizeCanvasToVideo() {
@@ -93,6 +126,22 @@ async function loadMushtiRequirements() {
     throw new Error("Failed to load mushti-requirements.json");
   }
   mushtiRequirements = await response.json();
+}
+
+async function loadRequirementsInfo() {
+  const response = await fetch("./requirements-info.json");
+  if (!response.ok) {
+    throw new Error("Failed to load requirements-info.json");
+  }
+  requirementsInfo = await response.json();
+}
+
+async function loadMovementRequirements() {
+  const response = await fetch("./movements.json");
+  if (!response.ok) {
+    throw new Error("Failed to load movements.json");
+  }
+  movementRequirements = await response.json();
 }
 
 function drawLandmarks(landmarks) {
@@ -137,14 +186,18 @@ function evaluateMushti(landmarks) {
 
   const wrist = landmarks[0];
   const threshold = mushtiRequirements.fingerThreshold ?? 0.92;
+  const fingerThresholds = mushtiRequirements.fingerThresholds || {};
   const fingerPairs = mushtiRequirements.fingers || [];
   let curled = 0;
   const metrics = fingerPairs.map(({ name, tipIndex, mcpIndex }) => {
     const tipDist = distance(landmarks[tipIndex], wrist);
     const mcpDist = distance(landmarks[mcpIndex], wrist);
     const ratio = tipDist / mcpDist;
-    const delta = ratio - threshold;
-    const curledFinger = ratio < threshold;
+    const fingerThreshold = Number.isFinite(fingerThresholds[name])
+      ? fingerThresholds[name]
+      : threshold;
+    const delta = ratio - fingerThreshold;
+    const curledFinger = ratio < fingerThreshold;
     if (curledFinger) {
       curled += 1;
     }
@@ -159,6 +212,7 @@ function evaluateMushti(landmarks) {
   const thumbConfig = mushtiRequirements.thumb;
   let thumbMetric = null;
   if (thumbConfig) {
+    // Thumb is considered curled when tip-to-wrist is shorter than MCP-to-wrist (below threshold ratio).
     const thumbThreshold = thumbConfig.threshold ?? threshold;
     const tipDist = distance(landmarks[thumbConfig.tipIndex], wrist);
     const mcpDist = distance(landmarks[thumbConfig.mcpIndex], wrist);
@@ -199,22 +253,31 @@ function renderMetrics(
   mushtiIndicator.classList.toggle("yes", isFist);
   mushtiIndicator.classList.toggle("no", !isFist);
 
+  const metricLine = (label, value) =>
+    `<div class="metric"><span>${label}</span><span>${value}</span></div>`;
+
   const mushtiLines = mushtiMetrics
     ? mushtiMetrics.map((metric) => {
         const offBy = Math.max(0, metric.delta);
         const offText = offBy === 0 ? "ok" : `off by +${offBy.toFixed(2)}`;
-        return `<div class="metric"><span>${metric.name}</span><span>${offText} (${metric.ratio.toFixed(
-          2
-        )})</span></div>`;
+        return metricLine(
+          metric.name,
+          `${offText} (${metric.ratio.toFixed(2)})`,
+          "fingerRatio"
+        );
       })
     : [`<div class="metric"><span>Mushti</span><span>no data</span></div>`];
   if (thumbMetric) {
     const offBy = Math.max(0, thumbMetric.delta);
     const offText = offBy === 0 ? "ok" : `off by +${offBy.toFixed(2)}`;
     mushtiLines.unshift(
-      `<div class="metric"><span>${thumbMetric.name}</span><span>${offText} (${thumbMetric.ratio.toFixed(
-        2
-      )} / ${thumbMetric.threshold.toFixed(2)})</span></div>`
+      metricLine(
+        thumbMetric.name,
+        `${offText} (${thumbMetric.ratio.toFixed(2)} / ${thumbMetric.threshold.toFixed(
+          2
+        )})`,
+        "thumbRatio"
+      )
     );
   }
 
@@ -232,32 +295,479 @@ function renderMetrics(
     displacement === null ? "n/a" : displacement.toFixed(3);
   const motionLines = motionMetrics
     ? [
-        `<div class="metric"><span>Samples</span><span>${motionMetrics.sampleCount}/${motionMetrics.minSamples}</span></div>`,
-        `<div class="metric"><span>Displacement</span><span>${displacementText} (${direction})</span></div>`,
-        `<div class="metric"><span>Threshold</span><span>${motionMetrics.displacementThreshold.toFixed(
-          3
-        )}</span></div>`,
-        `<div class="metric"><span>Cooldown</span><span>${Math.ceil(
-          motionMetrics.cooldownRemainingMs / 100
-        ) / 10}s</span></div>`
+        metricLine(
+          "Samples",
+          `${motionMetrics.sampleCount}/${motionMetrics.minSamples}`,
+          "samples"
+        ),
+        metricLine(
+          "Displacement",
+          `${displacementText} (${direction})`,
+          "displacement"
+        ),
+        metricLine(
+          "Threshold",
+          motionMetrics.displacementThreshold.toFixed(3),
+          "motionThreshold"
+        ),
+        metricLine(
+          "Cooldown",
+          `${Math.ceil(motionMetrics.cooldownRemainingMs / 100) / 10}s`,
+          "cooldown"
+        )
       ]
     : [`<div class="metric"><span>Motion</span><span>no data</span></div>`];
 
   metricsEl.innerHTML = [
-    `<div class="metric"><span>Mushti Threshold</span><span>${
+    metricLine(
+      "Mushti Threshold",
       mushtiThreshold !== null && mushtiThreshold !== undefined
         ? mushtiThreshold.toFixed(2)
-        : "n/a"
-    }</span></div>`,
-    `<div class="metric"><span>Required Curled</span><span>${
+        : "n/a",
+    ),
+    metricLine(
+      "Required Curled",
       requiredCurled !== null && requiredCurled !== undefined
         ? requiredCurled
-        : "n/a"
-    }</span></div>`,
+        : "n/a",
+    ),
     ...mushtiLines,
-    `<div class="metric"><span>Motion Window</span><span>${motionMetrics ? motionMetrics.bufferMs : "n/a"}ms</span></div>`,
+    metricLine(
+      "Motion Window",
+      motionMetrics ? `${motionMetrics.bufferMs}ms` : "n/a",
+    ),
     ...motionLines
   ].join("");
+}
+
+function renderMetricsInfo() {
+  if (!metricsInfoEl) return;
+  if (!requirementsInfo) {
+    metricsInfoEl.innerHTML =
+      "<div class=\"info-item\"><p>No info available.</p></div>";
+    return;
+  }
+
+  const items = [
+    { label: "Mushti Threshold", key: "mushtiThreshold" },
+    { label: "Required Curled", key: "requiredCurled" }
+  ];
+
+  if (mushtiRequirements && Array.isArray(mushtiRequirements.fingers)) {
+    mushtiRequirements.fingers.forEach((finger) => {
+      items.push({
+        label: `${finger.name} Ratio`,
+        key: "fingerRatio"
+      });
+    });
+  }
+
+  if (mushtiRequirements && mushtiRequirements.thumb) {
+    items.push({ label: "Thumb Ratio", key: "thumbRatio" });
+  }
+
+  items.push(
+    { label: "Motion Window", key: "motionWindow" },
+    { label: "Samples", key: "samples" },
+    { label: "Displacement", key: "displacement" },
+    { label: "Threshold", key: "motionThreshold" },
+    { label: "Cooldown", key: "cooldown" }
+  );
+
+  metricsInfoEl.innerHTML = items
+    .map((item) => {
+      const info = requirementsInfo[item.key] || "Info unavailable.";
+      return `<div class="info-item" data-key="${item.key}">
+        <div class="info-item-header">
+          <h3>${item.label}</h3>
+          <button class="info-item-toggle" type="button" data-state="on" aria-pressed="true">
+            <span class="toggle-dot"></span>
+            <span class="toggle-label">On</span>
+          </button>
+        </div>
+        <p>${info}</p>
+      </div>`;
+    })
+    .join("");
+}
+
+function formatControlValue(control, rawValue) {
+  const value = Number(rawValue);
+  if (control.format === "int") return `${Math.round(value)}`;
+  if (control.format === "ms") return `${Math.round(value)}ms`;
+  if (control.format === "ratio") return value.toFixed(2);
+  if (control.format === "threshold") return value.toFixed(3);
+  return `${value}`;
+}
+
+function ensureFingerThresholds() {
+  if (!mushtiRequirements) return;
+  if (!mushtiRequirements.fingerThresholds) {
+    mushtiRequirements.fingerThresholds = {};
+  }
+  const defaultThreshold = mushtiRequirements.fingerThreshold ?? 0.92;
+  (mushtiRequirements.fingers || []).forEach((finger) => {
+    if (!Number.isFinite(mushtiRequirements.fingerThresholds[finger.name])) {
+      mushtiRequirements.fingerThresholds[finger.name] = defaultThreshold;
+    }
+  });
+}
+
+function cloneConfig(config) {
+  return JSON.parse(JSON.stringify(config));
+}
+
+function showSavedIndicator() {
+  if (!controlsSavedEl) return;
+  controlsSavedEl.classList.add("is-visible");
+  if (savedTimeout) {
+    clearTimeout(savedTimeout);
+  }
+  savedTimeout = setTimeout(() => {
+    controlsSavedEl.classList.remove("is-visible");
+  }, 1200);
+}
+
+function applySavedSettings() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return;
+  try {
+    const saved = JSON.parse(raw);
+    if (saved.mushti) {
+      if (Number.isFinite(saved.mushti.fingerThreshold)) {
+        mushtiRequirements.fingerThreshold = saved.mushti.fingerThreshold;
+      }
+      if (Number.isFinite(saved.mushti.requiredCurledFingers)) {
+        mushtiRequirements.requiredCurledFingers =
+          saved.mushti.requiredCurledFingers;
+      }
+      if (Number.isFinite(saved.mushti.thumbThreshold)) {
+        if (!mushtiRequirements.thumb) {
+          mushtiRequirements.thumb = {
+            tipIndex: 4,
+            mcpIndex: 2,
+            threshold: saved.mushti.thumbThreshold
+          };
+        } else {
+          mushtiRequirements.thumb.threshold = saved.mushti.thumbThreshold;
+        }
+      }
+      if (saved.mushti.fingerThresholds) {
+        Object.entries(saved.mushti.fingerThresholds).forEach(
+          ([fingerName, value]) => {
+            if (!Number.isFinite(value)) return;
+            mushtiRequirements.fingerThresholds[fingerName] = value;
+          }
+        );
+      }
+    }
+    if (saved.movement) {
+      if (Number.isFinite(saved.movement.bufferMs)) {
+        movementRequirements.bufferMs = saved.movement.bufferMs;
+      }
+      if (Number.isFinite(saved.movement.minSamples)) {
+        movementRequirements.minSamples = saved.movement.minSamples;
+      }
+      if (Number.isFinite(saved.movement.displacementThreshold)) {
+        movementRequirements.displacementThreshold =
+          saved.movement.displacementThreshold;
+      }
+      if (Number.isFinite(saved.movement.cooldownMs)) {
+        movementRequirements.cooldownMs = saved.movement.cooldownMs;
+      }
+    }
+  } catch (error) {
+    console.warn("Failed to load saved controls.", error);
+  }
+}
+
+function persistControls() {
+  const payload = {
+    mushti: {
+      fingerThreshold: mushtiRequirements.fingerThreshold,
+      requiredCurledFingers: mushtiRequirements.requiredCurledFingers,
+      thumbThreshold: mushtiRequirements.thumb
+        ? mushtiRequirements.thumb.threshold
+        : null,
+      fingerThresholds: mushtiRequirements.fingerThresholds || {}
+    },
+    movement: {
+      bufferMs: movementRequirements.bufferMs,
+      minSamples: movementRequirements.minSamples,
+      displacementThreshold: movementRequirements.displacementThreshold,
+      cooldownMs: movementRequirements.cooldownMs
+    }
+  };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+  showSavedIndicator();
+}
+
+function getControlsConfig() {
+  const controls = [
+    {
+      id: "finger-threshold",
+      label: "Finger Curl Threshold",
+      group: "mushti",
+      key: "fingerThreshold",
+      min: 0.7,
+      max: 1.2,
+      step: 0.01,
+      format: "ratio",
+      value: mushtiRequirements.fingerThreshold ?? 0.92
+    }
+  ];
+
+  (mushtiRequirements.fingers || []).forEach((finger) => {
+    const value =
+      mushtiRequirements.fingerThresholds?.[finger.name] ??
+      mushtiRequirements.fingerThreshold ??
+      0.92;
+    controls.push({
+      id: `finger-${finger.name.toLowerCase()}`,
+      label: `${finger.name} Curl`,
+      group: "mushti-finger",
+      key: finger.name,
+      min: 0.7,
+      max: 1.2,
+      step: 0.01,
+      format: "ratio",
+      value
+    });
+  });
+
+  controls.push(
+    {
+      id: "thumb-threshold",
+      label: "Thumb Curl Threshold",
+      group: "mushti-thumb",
+      key: "threshold",
+      min: 0.7,
+      max: 1.2,
+      step: 0.01,
+      format: "ratio",
+      value:
+        (mushtiRequirements.thumb && mushtiRequirements.thumb.threshold) ?? 0.95
+    },
+    {
+      id: "required-curled",
+      label: "Required Curled",
+      group: "mushti",
+      key: "requiredCurledFingers",
+      min: 1,
+      max: 5,
+      step: 1,
+      format: "int",
+      value: mushtiRequirements.requiredCurledFingers ?? 4
+    },
+    {
+      id: "buffer-ms",
+      label: "Motion Window",
+      group: "motion",
+      key: "bufferMs",
+      min: 200,
+      max: 2000,
+      step: 50,
+      format: "ms",
+      value: movementRequirements.bufferMs ?? 1000
+    },
+    {
+      id: "min-samples",
+      label: "Min Samples",
+      group: "motion",
+      key: "minSamples",
+      min: 5,
+      max: 60,
+      step: 1,
+      format: "int",
+      value: movementRequirements.minSamples ?? 20
+    },
+    {
+      id: "displacement-threshold",
+      label: "Displacement Threshold",
+      group: "motion",
+      key: "displacementThreshold",
+      min: 0.01,
+      max: 0.2,
+      step: 0.005,
+      format: "threshold",
+      value: movementRequirements.displacementThreshold ?? 0.08
+    },
+    {
+      id: "cooldown-ms",
+      label: "Cooldown",
+      group: "motion",
+      key: "cooldownMs",
+      min: 500,
+      max: 5000,
+      step: 100,
+      format: "ms",
+      value: movementRequirements.cooldownMs ?? 2000
+    }
+  );
+
+  return controls;
+}
+
+function renderControls() {
+  if (!controlsEl || !mushtiRequirements || !movementRequirements) return;
+
+  const controls = getControlsConfig();
+
+  controlsEl.innerHTML = controls
+    .map((control) => {
+      const value = formatControlValue(control, control.value);
+      const fingerAttr =
+        control.group === "mushti-finger" ? ` data-finger="${control.key}"` : "";
+      return `<div class="control" data-group="${control.group}" data-key="${control.key}"${fingerAttr}>
+        <label for="${control.id}">${control.label}<span>${value}</span></label>
+        <input id="${control.id}" type="range" min="${control.min}" max="${control.max}" step="${control.step}" value="${control.value}">
+      </div>`;
+    })
+    .join("");
+}
+
+function updateControlsUI() {
+  const controls = getControlsConfig();
+  controls.forEach((control) => {
+    const input = document.getElementById(control.id);
+    if (!input) return;
+    input.value = control.value;
+    const label = input.closest(".control")?.querySelector("label span");
+    if (label) {
+      label.textContent = formatControlValue(control, control.value);
+    }
+  });
+}
+
+function bindControls() {
+  if (!controlsEl) return;
+  controlsEl.addEventListener("input", (event) => {
+    const target = event.target;
+    if (!target || target.tagName !== "INPUT") return;
+    const control = target.closest(".control");
+    if (!control) return;
+    const group = control.getAttribute("data-group");
+    const key = control.getAttribute("data-key");
+    const label = control.querySelector("label span");
+    if (!group || !key || !label) return;
+
+    const value = Number(target.value);
+    const format =
+      key === "displacementThreshold"
+        ? "threshold"
+        : key === "bufferMs" || key === "cooldownMs"
+          ? "ms"
+          : key === "fingerThreshold" || key === "threshold"
+            ? "ratio"
+            : "int";
+    label.textContent = formatControlValue({ format }, value);
+
+    if (group === "mushti") {
+      mushtiRequirements[key] = value;
+    } else if (group === "mushti-thumb") {
+      if (!mushtiRequirements.thumb) {
+        mushtiRequirements.thumb = {
+          tipIndex: 4,
+          mcpIndex: 2,
+          threshold: value
+        };
+      } else {
+        mushtiRequirements.thumb[key] = value;
+      }
+    } else if (group === "mushti-finger") {
+      const fingerName = control.getAttribute("data-finger");
+      if (!mushtiRequirements.fingerThresholds) {
+        mushtiRequirements.fingerThresholds = {};
+      }
+      if (fingerName) {
+        mushtiRequirements.fingerThresholds[fingerName] = value;
+      }
+    } else if (group === "motion") {
+      movementRequirements[key] = value;
+      classifier = createMotionClassifier(movementRequirements || {});
+    }
+    persistControls();
+  });
+}
+
+function bindResetControls() {
+  if (!resetControlsButton) return;
+  resetControlsButton.addEventListener("click", () => {
+    if (!defaultMushtiRequirements || !defaultMovementRequirements) return;
+    mushtiRequirements = cloneConfig(defaultMushtiRequirements);
+    movementRequirements = cloneConfig(defaultMovementRequirements);
+    ensureFingerThresholds();
+    classifier = createMotionClassifier(movementRequirements || {});
+    updateControlsUI();
+    renderMetricsInfo();
+    persistControls();
+  });
+}
+
+function bindInfoToggles() {
+  if (!metricsInfoEl) return;
+  metricsInfoEl.addEventListener("click", (event) => {
+    const toggle = event.target.closest(".info-item-toggle");
+    if (!toggle) return;
+    const item = toggle.closest(".info-item");
+    if (!item) return;
+    const isOn = toggle.getAttribute("data-state") === "on";
+    const nextState = isOn ? "off" : "on";
+    toggle.setAttribute("data-state", nextState);
+    toggle.setAttribute("aria-pressed", String(!isOn));
+    toggle.querySelector(".toggle-label").textContent = isOn ? "Off" : "On";
+    item.classList.toggle("is-off", isOn);
+  });
+}
+
+function bindInfoPanelToggle() {
+  if (!infoPanelToggle || !infoPanelShow || !infoCard || !contentEl) return;
+
+  const setHidden = (hidden) => {
+    infoCard.classList.toggle("is-hidden", hidden);
+    contentEl.classList.toggle("info-hidden", hidden);
+    infoPanelToggle.textContent = hidden ? "Show" : "Hide";
+    infoPanelToggle.setAttribute("aria-pressed", String(!hidden));
+    infoPanelShow.classList.toggle("is-hidden", !hidden);
+    infoPanelShow.setAttribute("aria-pressed", String(hidden));
+  };
+
+  infoPanelToggle.addEventListener("click", () => {
+    setHidden(!infoCard.classList.contains("is-hidden"));
+  });
+
+  infoPanelShow.addEventListener("click", () => {
+    setHidden(false);
+  });
+}
+
+function bindCameraToggle() {
+  if (!cameraToggle) return;
+  cameraToggle.addEventListener("click", async () => {
+    if (cameraActive) {
+      stopWebcam();
+      statusEl.textContent = "Camera stopped";
+      cameraToggle.textContent = "Start Camera";
+      cameraToggle.setAttribute("aria-pressed", "false");
+      return;
+    }
+
+    try {
+      statusEl.textContent = "Starting camera...";
+      if (!handLandmarker) {
+        await initHandLandmarker();
+      }
+      await startWebcam();
+      lastVideoTime = -1;
+      classifier.reset();
+      statusEl.textContent = "Ready";
+      cameraToggle.textContent = "Stop Camera";
+      cameraToggle.setAttribute("aria-pressed", "true");
+    } catch (error) {
+      console.error(error);
+      statusEl.textContent = "Failed to start camera.";
+    }
+  });
 }
 
 function logAction({ label, confidence }) {
@@ -269,7 +779,10 @@ function logAction({ label, confidence }) {
 }
 
 function detectHands() {
-  if (!handLandmarker) return;
+  if (!handLandmarker || !classifier || !cameraActive) {
+    requestAnimationFrame(detectHands);
+    return;
+  }
 
   if (videoEl.currentTime !== lastVideoTime) {
     lastVideoTime = videoEl.currentTime;
@@ -323,6 +836,21 @@ async function init() {
   try {
     statusEl.textContent = "Loading model...";
     await loadMushtiRequirements();
+    await loadRequirementsInfo();
+    await loadMovementRequirements();
+    ensureFingerThresholds();
+    defaultMushtiRequirements = cloneConfig(mushtiRequirements);
+    defaultMovementRequirements = cloneConfig(movementRequirements);
+    applySavedSettings();
+    ensureFingerThresholds();
+    renderMetricsInfo();
+    renderControls();
+    bindControls();
+    classifier = createMotionClassifier(movementRequirements || {});
+    bindInfoToggles();
+    bindInfoPanelToggle();
+    bindResetControls();
+    bindCameraToggle();
     await initHandLandmarker();
 
     statusEl.textContent = "Starting camera...";

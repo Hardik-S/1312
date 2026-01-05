@@ -19,8 +19,30 @@
           <p class="eyebrow">Mushti Motion Classifier</p>
           <h1>Detect Steadiness vs Courage</h1>
         </div>
-        <div class="status" id="status">Initializing...</div>
+        <div class="header-actions">
+          <button id="info-panel-show" type="button" aria-pressed="false">
+            Show Info
+          </button>
+          <button id="camera-toggle" type="button" aria-pressed="true">
+            Stop Camera
+          </button>
+          <div class="status" id="status">Initializing...</div>
+        </div>
       </header>
+
+      <section class="controls-card">
+        <div class="controls-header">
+          <div>
+            <h2>Live Controls</h2>
+            <p>Adjust thresholds and timing to tune detections.</p>
+          </div>
+          <div class="controls-actions">
+            <span id="controls-saved" class="controls-saved">Saved</span>
+            <button id="controls-reset" type="button">Reset to JSON</button>
+          </div>
+        </div>
+        <div id="controls" class="controls-grid"></div>
+      </section>
 
       <section class="content">
         <div class="video-card">
@@ -46,6 +68,16 @@
             <button id="clear-log" type="button">Clear</button>
           </div>
           <div class="log-body" id="action-log"></div>
+        </aside>
+
+        <aside class="info-card">
+          <div class="info-header">
+            <h2>Metric Info</h2>
+            <button id="info-panel-toggle" type="button" aria-pressed="true">
+              Hide
+            </button>
+          </div>
+          <div id="metrics-info" class="info-list"></div>
         </aside>
       </section>
     </main>

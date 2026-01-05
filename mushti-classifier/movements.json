@@ -1,0 +1,18 @@
+{
+  "bufferMs": 1000,
+  "minSamples": 20,
+  "displacementThreshold": 0.08,
+  "cooldownMs": 2000,
+  "labels": {
+    "steadiness": {
+      "direction": "down",
+      "displacementSign": "positive",
+      "meaning": "Net wrist Y movement downward over the window."
+    },
+    "courage": {
+      "direction": "up",
+      "displacementSign": "negative",
+      "meaning": "Net wrist Y movement upward over the window."
+    }
+  }
+}
