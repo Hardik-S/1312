@@ -4,6 +4,7 @@ import {
 } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest";
 
 import { createMotionClassifier } from "./classifier.js";
+import { renderBulletList, statusFromProgress } from "./feedback-render.js";
 
 const MODEL_URL =
   "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/latest/hand_landmarker.task";
@@ -18,6 +19,7 @@ const mushtiIndicator = document.getElementById("mushti-indicator");
 const metricsEl = document.getElementById("mushti-metrics");
 const metricsInfoEl = document.getElementById("metrics-info");
 const feedbackEl = document.getElementById("mushti-feedback");
+const graceTimerEl = document.getElementById("grace-timer");
 const infoPanelToggle = document.getElementById("info-panel-toggle");
 const infoPanelShow = document.getElementById("info-panel-show");
 const infoCard = document.querySelector(".info-card");
@@ -26,6 +28,8 @@ const controlsEl = document.getElementById("controls");
 const resetControlsButton = document.getElementById("controls-reset");
 const cameraToggle = document.getElementById("camera-toggle");
 const controlsSavedEl = document.getElementById("controls-saved");
+const controlsToggle = document.getElementById("controls-toggle");
+const controlsCard = document.querySelector(".controls-card");
 
 const ctx = canvasEl.getContext("2d");
 let classifier = null;
@@ -42,6 +46,11 @@ let defaultMovementRequirements = null;
 let cameraStream = null;
 let cameraActive = false;
 let savedTimeout = null;
+let lastFist = false;
+let actionLocked = false;
+let sliderRanges = null;
+let graceStartY = null;
+let graceStartMs = null;
 
 const STORAGE_KEY = "mushti-controls-v1";
 
@@ -145,6 +154,14 @@ async function loadMovementRequirements() {
   movementRequirements = await response.json();
 }
 
+async function loadSliderRanges() {
+  const response = await fetch("./slider-min-max.json");
+  if (!response.ok) {
+    throw new Error("Failed to load slider-min-max.json");
+  }
+  sliderRanges = await response.json();
+}
+
 function drawLandmarks(landmarks) {
   ctx.clearRect(0, 0, displayWidth, displayHeight);
 
@@ -165,6 +182,20 @@ function drawLandmarks(landmarks) {
     ctx.arc(lm.x * displayWidth, lm.y * displayHeight, 3, 0, Math.PI * 2);
     ctx.fill();
   });
+function getPitchUp(landmarks, threshold) {
+  if (!landmarks || landmarks.length === 0) {
+    return { pitchUp: false, delta: null };
+  }
+  const wrist = landmarks[0];
+  const mcpIndices = [5, 9, 13, 17];
+  const avgMcpZ =
+    mcpIndices.reduce((sum, index) => sum + (landmarks[index]?.z || 0), 0) /
+    mcpIndices.length;
+  const delta = wrist.z - avgMcpZ;
+  return {
+    pitchUp: delta >= threshold,
+    delta
+  };
 }
 
 function distance(a, b) {
@@ -313,6 +344,32 @@ function renderMetrics(
           "displacement"
         ),
         metricLine(
+          "Grace Window",
+          motionMetrics.graceWindowMs ? `${motionMetrics.graceWindowMs}ms` : "n/a",
+          "graceWindow"
+        ),
+        metricLine(
+          "Upward Enough",
+          motionMetrics.upwardThreshold
+            ? motionMetrics.upwardThreshold.toFixed(3)
+            : "n/a",
+          "upwardThreshold"
+        ),
+        metricLine(
+          "Downward Enough",
+          motionMetrics.downwardThreshold
+            ? motionMetrics.downwardThreshold.toFixed(3)
+            : "n/a",
+          "downwardThreshold"
+        ),
+        metricLine(
+          "Pitch Up",
+          motionMetrics.pitchDelta !== null && motionMetrics.pitchDelta !== undefined
+            ? `${motionMetrics.pitchUp ? "yes" : "no"} (${motionMetrics.pitchDelta.toFixed(3)})`
+            : "n/a",
+          "pitchUpThreshold"
+        ),
+        metricLine(
           "Threshold",
           motionMetrics.displacementThreshold.toFixed(3),
           "motionThreshold"
@@ -345,21 +402,83 @@ function renderMetrics(
     ),
     ...motionLines
   ].join("");
+
+  if (graceTimerEl) {
+    const baseGraceMs = movementRequirements?.graceWindowMs ?? 0;
+    const graceMs = isFist
+      ? baseGraceMs
+      : motionMetrics && motionMetrics.graceRemainingMs
+        ? Math.max(0, Math.round(motionMetrics.graceRemainingMs))
+        : 0;
+    graceTimerEl.textContent =
+      graceMs > 0
+        ? `Grace window: ${graceMs}ms (move up for Courage, down for Steadiness)`
+        : "";
+  }
 }
 
-function renderMushtiFeedback(mushtiEval) {
+function renderMushtiFeedback(mushtiEval, { graceActive, graceDisplacement } = {}) {
   if (!feedbackEl) return;
   if (!mushtiEval) {
-    feedbackEl.innerHTML = "<ul><li>Place your hand in frame to start.</li></ul>";
+    feedbackEl.innerHTML = renderBulletList([
+      { label: "Place your hand in frame to start.", status: "" }
+    ]);
+    return;
+  }
+
+  if (mushtiEval.isFist) {
+    const pitchThreshold = movementRequirements?.pitchUpThreshold ?? 0.01;
+    const pitch = mushtiEval.pitch || { pitchUp: false, delta: null };
+    const upwardThreshold = movementRequirements?.upwardThreshold ?? 0.06;
+    const downwardThreshold = movementRequirements?.downwardThreshold ?? 0.06;
+    const upwardProgress =
+      graceActive && graceDisplacement < 0
+        ? Math.min(1, Math.abs(graceDisplacement) / upwardThreshold)
+        : 0;
+    const downwardProgress =
+      graceActive && graceDisplacement > 0
+        ? Math.min(1, graceDisplacement / downwardThreshold)
+        : 0;
+
+    const courageItems = [
+      {
+        label: "Tilt wrist toward camera (pitch up).",
+        status: statusFromProgress(
+          pitch.delta !== null && pitchThreshold
+            ? Math.max(0, pitch.delta / pitchThreshold)
+            : 0
+        )
+      },
+      {
+        label: `Move upward by at least ${upwardThreshold.toFixed(3)}.`,
+        status: statusFromProgress(upwardProgress)
+      }
+    ];
+
+    const steadinessItems = [
+      {
+        label: `Move downward by at least ${downwardThreshold.toFixed(3)}.`,
+        status: statusFromProgress(downwardProgress)
+      }
+    ];
+
+    feedbackEl.innerHTML = `<div class="feedback-split">
+      <div>
+        <strong>Courage</strong>
+        ${renderBulletList(courageItems, { sort: false })}
+      </div>
+      <div>
+        <strong>Steadiness</strong>
+        ${renderBulletList(steadinessItems, { sort: false })}
+      </div>
+    </div>`;
     return;
   }
 
   const items = [];
 
   const addItem = (label, progress) => {
-    const status =
-      progress >= 1 ? "is-met" : progress >= 0.8 ? "is-close" : "";
-    items.push({ label, status });
+    items.push({ label, status: statusFromProgress(progress) });
   };
 
   const required = mushtiEval.requiredCurled ?? 0;
@@ -386,14 +505,7 @@ function renderMushtiFeedback(mushtiEval) {
     );
   }
 
-  const listItems = items
-    .map(
-      (item) =>
-        `<li class="${item.status}">${item.label}</li>`
-    )
-    .join("");
-
-  feedbackEl.innerHTML = `<ul>${listItems}</ul>`;
+  feedbackEl.innerHTML = renderBulletList(items);
 }
 
 function renderMetricsInfo() {
@@ -424,8 +536,12 @@ function renderMetricsInfo() {
 
   items.push(
     { label: "Motion Window", key: "motionWindow" },
+    { label: "Grace Window", key: "graceWindow" },
     { label: "Samples", key: "samples" },
     { label: "Displacement", key: "displacement" },
+    { label: "Upward Enough", key: "upwardThreshold" },
+    { label: "Downward Enough", key: "downwardThreshold" },
+    { label: "Pitch Up Threshold", key: "pitchUpThreshold" },
     { label: "Threshold", key: "motionThreshold" },
     { label: "Cooldown", key: "cooldown" }
   );
@@ -454,6 +570,11 @@ function formatControlValue(control, rawValue) {
   if (control.format === "ratio") return value.toFixed(2);
   if (control.format === "threshold") return value.toFixed(3);
   return `${value}`;
+}
+
+function getRangeConfig(key, fallback) {
+  if (!sliderRanges) return fallback;
+  return sliderRanges[key] || fallback;
 }
 
 function ensureFingerThresholds() {
@@ -531,6 +652,18 @@ function applySavedSettings() {
       if (Number.isFinite(saved.movement.cooldownMs)) {
         movementRequirements.cooldownMs = saved.movement.cooldownMs;
       }
+      if (Number.isFinite(saved.movement.graceWindowMs)) {
+        movementRequirements.graceWindowMs = saved.movement.graceWindowMs;
+      }
+      if (Number.isFinite(saved.movement.upwardThreshold)) {
+        movementRequirements.upwardThreshold = saved.movement.upwardThreshold;
+      }
+      if (Number.isFinite(saved.movement.downwardThreshold)) {
+        movementRequirements.downwardThreshold = saved.movement.downwardThreshold;
+      }
+      if (Number.isFinite(saved.movement.pitchUpThreshold)) {
+        movementRequirements.pitchUpThreshold = saved.movement.pitchUpThreshold;
+      }
     }
   } catch (error) {
     console.warn("Failed to load saved controls.", error);
@@ -551,7 +684,11 @@ function persistControls() {
       bufferMs: movementRequirements.bufferMs,
       minSamples: movementRequirements.minSamples,
       displacementThreshold: movementRequirements.displacementThreshold,
-      cooldownMs: movementRequirements.cooldownMs
+      cooldownMs: movementRequirements.cooldownMs,
+      graceWindowMs: movementRequirements.graceWindowMs,
+      upwardThreshold: movementRequirements.upwardThreshold,
+      downwardThreshold: movementRequirements.downwardThreshold,
+      pitchUpThreshold: movementRequirements.pitchUpThreshold
     }
   };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
@@ -565,9 +702,7 @@ function getControlsConfig() {
       label: "Finger Curl Threshold",
       group: "mushti",
       key: "fingerThreshold",
-      min: 0.7,
-      max: 1.2,
-      step: 0.01,
+      ...getRangeConfig("fingerThreshold", { min: 0.7, max: 1.2, step: 0.01 }),
       format: "ratio",
       value: mushtiRequirements.fingerThreshold ?? 0.92
     }
@@ -583,9 +718,7 @@ function getControlsConfig() {
       label: `${finger.name} Curl`,
       group: "mushti-finger",
       key: finger.name,
-      min: 0.7,
-      max: 1.2,
-      step: 0.01,
+      ...getRangeConfig("fingerThresholds", { min: 0.7, max: 1.2, step: 0.01 }),
       format: "ratio",
       value
     });
@@ -597,9 +730,7 @@ function getControlsConfig() {
       label: "Thumb Touch Threshold",
       group: "mushti-thumb",
       key: "threshold",
-      min: 0.01,
-      max: 0.2,
-      step: 0.005,
+      ...getRangeConfig("thumbThreshold", { min: 0.01, max: 0.2, step: 0.005 }),
       format: "threshold",
       value:
         (mushtiRequirements.thumb && mushtiRequirements.thumb.threshold) ?? 0.08
@@ -609,9 +740,7 @@ function getControlsConfig() {
       label: "Required Curled",
       group: "mushti",
       key: "requiredCurledFingers",
-      min: 1,
-      max: 5,
-      step: 1,
+      ...getRangeConfig("requiredCurledFingers", { min: 1, max: 5, step: 1 }),
       format: "int",
       value: mushtiRequirements.requiredCurledFingers ?? 4
     },
@@ -620,31 +749,61 @@ function getControlsConfig() {
       label: "Motion Window",
       group: "motion",
       key: "bufferMs",
-      min: 200,
-      max: 2000,
-      step: 50,
+      ...getRangeConfig("bufferMs", { min: 200, max: 2000, step: 50 }),
       format: "ms",
       value: movementRequirements.bufferMs ?? 1000
+    },
+    {
+      id: "grace-window-ms",
+      label: "Grace Window",
+      group: "motion",
+      key: "graceWindowMs",
+      ...getRangeConfig("graceWindowMs", { min: 500, max: 4000, step: 100 }),
+      format: "ms",
+      value: movementRequirements.graceWindowMs ?? 2000
     },
     {
       id: "min-samples",
       label: "Min Samples",
       group: "motion",
       key: "minSamples",
-      min: 5,
-      max: 60,
-      step: 1,
+      ...getRangeConfig("minSamples", { min: 5, max: 60, step: 1 }),
       format: "int",
       value: movementRequirements.minSamples ?? 20
+    },
+    {
+      id: "upward-threshold",
+      label: "Upward Enough",
+      group: "motion",
+      key: "upwardThreshold",
+      ...getRangeConfig("upwardThreshold", { min: 0.01, max: 0.2, step: 0.005 }),
+      format: "threshold",
+      value: movementRequirements.upwardThreshold ?? 0.06
+    },
+    {
+      id: "downward-threshold",
+      label: "Downward Enough",
+      group: "motion",
+      key: "downwardThreshold",
+      ...getRangeConfig("downwardThreshold", { min: 0.01, max: 0.2, step: 0.005 }),
+      format: "threshold",
+      value: movementRequirements.downwardThreshold ?? 0.06
+    },
+    {
+      id: "pitch-up-threshold",
+      label: "Pitch Up Threshold",
+      group: "motion",
+      key: "pitchUpThreshold",
+      ...getRangeConfig("pitchUpThreshold", { min: 0.01, max: 0.2, step: 0.005 }),
+      format: "threshold",
+      value: movementRequirements.pitchUpThreshold ?? 0.04
     },
     {
       id: "displacement-threshold",
       label: "Displacement Threshold",
       group: "motion",
       key: "displacementThreshold",
-      min: 0.01,
-      max: 0.2,
-      step: 0.005,
+      ...getRangeConfig("displacementThreshold", { min: 0.01, max: 0.2, step: 0.005 }),
       format: "threshold",
       value: movementRequirements.displacementThreshold ?? 0.08
     },
@@ -653,15 +812,19 @@ function getControlsConfig() {
       label: "Cooldown",
       group: "motion",
       key: "cooldownMs",
-      min: 500,
-      max: 5000,
-      step: 100,
+      ...getRangeConfig("cooldownMs", { min: 500, max: 5000, step: 100 }),
       format: "ms",
       value: movementRequirements.cooldownMs ?? 2000
     }
   );
 
   return controls;
+}
+
+function buildClassifierConfig() {
+  return {
+    ...movementRequirements
+  };
 }
 
 function renderControls() {
@@ -709,9 +872,12 @@ function bindControls() {
 
     const value = Number(target.value);
     const format =
-      key === "displacementThreshold"
+      key === "displacementThreshold" ||
+      key === "upwardThreshold" ||
+      key === "downwardThreshold" ||
+      key === "pitchUpThreshold"
         ? "threshold"
-        : key === "bufferMs" || key === "cooldownMs"
+        : key === "bufferMs" || key === "cooldownMs" || key === "graceWindowMs"
           ? "ms"
           : key === "fingerThreshold" || key === "threshold"
             ? "ratio"
@@ -740,7 +906,7 @@ function bindControls() {
       }
     } else if (group === "motion") {
       movementRequirements[key] = value;
-      classifier = createMotionClassifier(movementRequirements || {});
+      classifier = createMotionClassifier(buildClassifierConfig());
     }
     persistControls();
   });
@@ -753,10 +919,20 @@ function bindResetControls() {
     mushtiRequirements = cloneConfig(defaultMushtiRequirements);
     movementRequirements = cloneConfig(defaultMovementRequirements);
     ensureFingerThresholds();
-    classifier = createMotionClassifier(movementRequirements || {});
+    classifier = createMotionClassifier(buildClassifierConfig());
     updateControlsUI();
     renderMetricsInfo();
     persistControls();
+  });
+}
+
+function bindControlsToggle() {
+  if (!controlsToggle || !controlsCard) return;
+  controlsToggle.addEventListener("click", () => {
+    const isCollapsed = controlsCard.classList.contains("is-collapsed");
+    controlsCard.classList.toggle("is-collapsed", !isCollapsed);
+    controlsToggle.textContent = isCollapsed ? "Collapse" : "Expand";
+    controlsToggle.setAttribute("aria-pressed", String(isCollapsed));
   });
 }
 
@@ -800,13 +976,17 @@ function bindInfoPanelToggle() {
 function bindCameraToggle() {
   if (!cameraToggle) return;
   cameraToggle.addEventListener("click", async () => {
-    if (cameraActive) {
-      stopWebcam();
-      statusEl.textContent = "Camera stopped";
-      cameraToggle.textContent = "Start Camera";
-      cameraToggle.setAttribute("aria-pressed", "false");
-      return;
-    }
+      if (cameraActive) {
+        stopWebcam();
+        statusEl.textContent = "Camera stopped";
+        cameraToggle.textContent = "Start Camera";
+        cameraToggle.setAttribute("aria-pressed", "false");
+        lastFist = false;
+        actionLocked = false;
+        graceStartY = null;
+        graceStartMs = null;
+        return;
+      }
 
     try {
       statusEl.textContent = "Starting camera...";
@@ -854,27 +1034,63 @@ function detectHands() {
       const fist = mushtiEval.isFist;
       let motion = null;
 
-      if (fist) {
-        motion = classifier.update(landmarks, nowMs);
+      const pitchThreshold = movementRequirements?.pitchUpThreshold ?? 0.01;
+      const pitch = getPitchUp(landmarks, pitchThreshold);
+
+      mushtiEval.pitch = pitch;
+
+      if (fist && classifier.cancelGrace) {
+        classifier.cancelGrace();
+        graceStartY = null;
+        graceStartMs = null;
+      }
+      if (!fist && lastFist && classifier.startGrace) {
+        classifier.startGrace(landmarks[0].y, nowMs);
+        graceStartY = landmarks[0].y;
+        graceStartMs = nowMs;
+      }
+
+      const diagnostics = classifier.getDiagnostics(nowMs);
+      diagnostics.pitchUp = pitch.pitchUp;
+      diagnostics.pitchDelta = pitch.delta;
+      const graceActive =
+        diagnostics.graceRemainingMs && diagnostics.graceRemainingMs > 0;
+      const graceDisplacement =
+        graceActive && graceStartY !== null ? landmarks[0].y - graceStartY : 0;
+
+      if (!fist && graceActive && !actionLocked) {
+        motion = classifier.update(landmarks, nowMs, null, {
+          courageAllowed: pitch.pitchUp
+        });
         if (motion) {
           logAction(motion);
+          actionLocked = true;
         }
       } else {
-        classifier.reset();
+        classifier.resetSamples();
       }
+
+      if (fist && !lastFist) {
+        actionLocked = false;
+      }
+      lastFist = fist;
 
       renderMetrics(
         fist,
         mushtiEval.metrics,
-        classifier.getDiagnostics(nowMs),
+        diagnostics,
         mushtiEval.threshold,
         mushtiEval.requiredCurled,
         mushtiEval.thumbMetric
       );
-      renderMushtiFeedback(mushtiEval);
+      renderMushtiFeedback(mushtiEval, { graceActive, graceDisplacement });
     } else {
       ctx.clearRect(0, 0, displayWidth, displayHeight);
       classifier.reset();
+      lastFist = false;
+      actionLocked = false;
+      graceStartY = null;
+      graceStartMs = null;
       renderMetrics(
         false,
         null,
@@ -896,6 +1112,7 @@ async function init() {
     await loadMushtiRequirements();
     await loadRequirementsInfo();
     await loadMovementRequirements();
+    await loadSliderRanges();
     ensureFingerThresholds();
     defaultMushtiRequirements = cloneConfig(mushtiRequirements);
     defaultMovementRequirements = cloneConfig(movementRequirements);
@@ -904,10 +1121,11 @@ async function init() {
     renderMetricsInfo();
     renderControls();
     bindControls();
-    classifier = createMotionClassifier(movementRequirements || {});
+    classifier = createMotionClassifier(buildClassifierConfig());
     bindInfoToggles();
     bindInfoPanelToggle();
     bindResetControls();
+    bindControlsToggle();
     bindCameraToggle();
     await initHandLandmarker();
 

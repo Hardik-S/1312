@@ -1,0 +1,7 @@
+The paper MUST include the following elements:
+- Not overly technical and must sound human-written (limit lists of 3s and replace with just 2 or 4; do not have more than 1 sentence in the format of "it is not X, but Y" or "rather than X, it is Y"/"it is Y, rather than X", etc.)
+- the authors are Ananya and Hardik (Hardik mainly for the actual experimental and coding input - Ananya for the writing and analysis, and background expertise on Bharatanatyam)
+- a healthy balance between computer science elements (Hardik's strengths and expertise - an undergraduate student with a double major, honors computer science and Ivey business) and linguistics, particularly semantics and pragmatics (Ananya's strengths and expertise - a graduate student in linguistics)
+- "Ananya SOI.txt" shows Ananya's statement of interest for her next graduate degree, so this project must be applicable to that context in some way (not a major requirement)
+- "Ananya Writing Style.txt" shows Ananya's writing style and must mimic that writing style as much as possible (while keeping in mind the first instruction where certain sentence formats are now prohibited).
+- "Ananya MRP.txt" gives information for Ananya's current MRP proposal (for linguistics) - use that as a natural starting point of inquiry for this paper.

@@ -1,0 +1,14 @@
+{
+  "fingerThreshold": { "min": 0.7, "max": 1.2, "step": 0.01 },
+  "fingerThresholds": { "min": 0.7, "max": 1.2, "step": 0.01 },
+  "requiredCurledFingers": { "min": 1, "max": 5, "step": 1 },
+  "thumbThreshold": { "min": 0.001, "max": 0.2, "step": 0.001 },
+  "bufferMs": { "min": 200, "max": 2000, "step": 50 },
+  "graceWindowMs": { "min": 500, "max": 40000, "step": 100 },
+  "minSamples": { "min": 5, "max": 60, "step": 1 },
+  "upwardThreshold": { "min": 0.01, "max": 0.2, "step": 0.005 },
+  "downwardThreshold": { "min": 0.01, "max": 0.2, "step": 0.005 },
+  "displacementThreshold": { "min": 0.01, "max": 0.2, "step": 0.005 },
+  "cooldownMs": { "min": 500, "max": 5000, "step": 100 },
+  "pitchUpThreshold": { "min": 0.01, "max": 0.2, "step": 0.005 }
+}

@@ -1,0 +1,78 @@
+\documentclass[11pt]{article}
+
+% Change "review" to "final" for camera-ready.
+\usepackage[review]{acl}
+
+% Standard package includes
+\usepackage{times}
+\usepackage{latexsym}
+
+% For proper rendering and hyphenation of words containing Latin characters
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+% Improve layout and typewriter font aesthetics
+\usepackage{microtype}
+\usepackage{inconsolata}
+
+% For figures
+\usepackage{graphicx}
+
+\title{Semantic Captioning for Bharatanatyam via Mushti Motion Classification}
+
+\author{Anonymous Authors}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This paper presents a semantic analysis aimed at enabling AI closed captioning for Bharatanatyam (BN), with a first computational component that detects the Mushti (closed-fist) gesture and maps its vertical motion to two semantic labels: courage and steadiness. The system is a browser-based demo that runs on webcam input using MediaPipe hand landmarks and exposes its thresholds as live, persistent controls, which keeps the analysis transparent and tunable. The dataset includes 60 short clips (30 for courage and 30 for steadiness), each 2 seconds long. We do not report metrics yet; instead we focus on the interpretive link between gesture and meaning, and show how the Mushti classifier can serve as one measurable anchor for future captioning systems that are sensitive to semantic nuance in classical dance.
+\end{abstract}
+
+\paragraph{TL;DR} We present a semantic analysis for BN captioning and a Mushti-based classifier that maps vertical motion to courage vs.\ steadiness with transparent, tunable thresholds.
+
+\section{Introduction}
+Bharatanatyam is a structured system of embodied meaning, where hand gestures and timing produce semantic content that a trained audience can read. The long-term goal of this project is AI closed captioning for BN, so that a model can recognize motion and meaning. This draft focuses on a single semantic unit: Mushti, a closed fist gesture whose vertical motion is commonly read as courage or steadiness in performance contexts. Our approach balances semantic analysis with a transparent, controllable computational component and does not claim model performance.
+
+\section{Background and Motivation}
+Prior linguistic work shows that meaning can be encoded in form, using morphology as a test case for explicitness and illocutionary force. The same analytic posture can be applied to gesture in Bharatanatyam, where form is conventional and meaning is structured, which makes gesture a plausible target for semantic annotation and modeling. The project treats performance as a site where linguistic structure and embodied gesture can be studied together. We focus on Mushti because it is formally distinct and semantically legible, while still being small enough to support a controlled dataset in an early stage of a larger captioning pipeline.
+
+\section{System Overview}
+The system is a lightweight, browser-based app that uses MediaPipe hand landmarks to detect Mushti and classify vertical wrist motion. The interface pairs a live demo with an explanation panel, and it provides controls for thresholds and timing, with settings stored in local storage so calibration survives refreshes. Requirements are centralized in JSON files, including motion thresholds in \texttt{movements.json} and finger curl parameters in \texttt{mushti-requirements.json}. The controls make the model behavior visible and adjustable during live use, which aligns with the explainability focus of ACL 2026 and keeps the semantic claims tied to observable signals rather than black-box behavior.
+
+\section{Mushti Detection and Semantic Mapping}
+Mushti is detected by comparing ratios of wrist-to-tip and wrist-to-MCP distances for each finger. A finger is treated as curled when its ratio falls below a threshold, and the gesture is marked as Mushti when a required count of fingers, including the thumb, meet their thresholds. When Mushti is active, the system tracks wrist Y displacement over a time window and labels downward motion as steadiness and upward motion as courage. The label-direction mapping is configurable so the semantic assignment remains explicit and inspectable, and the system logs each detected label with a confidence score derived from displacement magnitude.
+
+\section{Data}
+The dataset used in this draft consists of 60 short clips: 30 two-second videos labeled as courage and 30 two-second videos labeled as steadiness. These clips serve as a minimal dataset for examining whether the Mushti-based mapping can support a semantic distinction that is meaningful in performance practice. At this stage we do not report evaluation metrics, since the dataset is intended to validate the semantic framing rather than optimize classification accuracy. Future work will add more gestures and longer sequences, which is necessary for a full captioning system.
+
+\section{Discussion}
+The main contribution is a clear link between a specific BN gesture and two semantic words that are meaningful for closed captioning. The Mushti classifier is therefore not an end in itself; it is one piece of a semantic vocabulary that can eventually cover a larger portion of the dance lexicon. The system also demonstrates how a transparent, adjustable pipeline can support semantic analysis by letting researchers tune thresholds in real time and observe how meaning assignments shift under controlled changes.
+
+This framing keeps a balance between computational clarity and linguistic interpretation, which reflects the project's dual goal: to remain precise in computational terms while still respecting the interpretive structure of performance.
+
+\section*{Limitations}
+This draft covers only one gesture and two semantic labels, and it uses a small dataset of short clips. The system has not yet been evaluated on longer sequences or on multiple performers, and it cannot capture the full range of meaning conveyed by timing or narrative context, nor does it model facial expression. These constraints are expected at this stage, but they limit claims about general captioning performance.
+
+\section*{Ethical Considerations}
+The system operates on local webcam input and does not transmit video off-device. Users should be informed when the camera is active and can stop the stream at any time. Future dataset expansion should include explicit consent from performers and clear policies for annotation use.
+
+\section*{AI Assistance Disclosure}
+If generative tools are used for writing or coding, their use will be disclosed in the Responsible NLP checklist and acknowledgements, following ARR and ACL policy. The authors remain responsible for correctness and for proper citation.
+
+\section*{References}
+\begin{thebibliography}{}
+\bibitem[\protect\citename{Austin}1962]{austin1962}
+Austin, J. L. 1962. \textit{How to Do Things with Words}. Oxford University Press.
+
+\bibitem[\protect\citename{Schiffman}1979]{schiffman1979}
+Schiffman, H. F. 1979. \textit{A Reference Grammar of Spoken Kannada}. Bureau of Postsecondary Education.
+
+\bibitem[\protect\citename{Steever}1998]{steever1998}
+Steever, S. B. 1998. Kannada. In \textit{The Dravidian Languages}, 194--212. Routledge.
+
+\bibitem[\protect\citename{Zarrilli}1998]{zarrilli1998}
+Zarrilli, P. B. 1998. \textit{When the Body Becomes All Eyes}. Oxford University Press.
+\end{thebibliography}
+
+\end{document}

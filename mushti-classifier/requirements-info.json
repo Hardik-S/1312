@@ -7,5 +7,9 @@
   "samples": "How many recent frames are in the motion buffer vs the minimum needed.",
   "displacement": "Net wrist Y movement over the window. Down = steadiness, up = courage.",
   "motionThreshold": "Minimum displacement to trigger an action label.",
-  "cooldown": "Minimum time between logged actions."
+  "cooldown": "Minimum time between logged actions.",
+  "graceWindow": "Grace period (ms) after Mushti is achieved to classify the first move.",
+  "upwardThreshold": "Minimum upward wrist movement during grace window to trigger Courage.",
+  "downwardThreshold": "Minimum downward wrist movement during grace window to trigger Steadiness.",
+  "pitchUpThreshold": "Minimum wrist-to-finger MCP Z delta (toward camera) to count as a pitch-up rotation."
 }

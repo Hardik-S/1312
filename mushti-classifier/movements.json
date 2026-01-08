@@ -3,6 +3,10 @@
   "minSamples": 20,
   "displacementThreshold": 0.08,
   "cooldownMs": 2000,
+  "graceWindowMs": 2000,
+  "upwardThreshold": 0.06,
+  "downwardThreshold": 0.06,
+  "pitchUpThreshold": 0.01,
   "labels": {
     "steadiness": {
       "direction": "down",

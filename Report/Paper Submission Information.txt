@@ -1,0 +1,139 @@
+ACL Rolling Review (ARR) invites the submission of long and short papers on substantial, original, and unpublished research in all aspects of Computational Linguistics and Natural Language Processing. The purpose of ARR is to improve the efficiency, turnaround, and process consistency of ACL reviewing, while keeping the diversity (topical, geographic and otherwise) and iterative improvement through collaborative work with conference program chairs. ARR will use Open Review as its platform (but reviews will not be open in ARR). The reviewing and acceptance of papers for publication will be done in two steps:
+
+Step 1 – Centralized Rolling Review: Authors submit papers to a unified review pool with deadlines every two months. Review is handled by an area chair (AC), and revision and resubmission of papers are allowed.
+Step 2 – Commitment to a Publication Venue: A publication venue is a conference or workshop that accepts reviews from ARR. When an opportunity to commit to a publication venue comes around, authors may submit papers with fully completed reviews (including meta reviews). Program chairs decide the process for committing ARR reviewed papers, as well as the criteria and process for deciding to accept a subset of these submissions into their event.
+SCOPE OF SUBMISSIONS
+All topics in Computational Linguistics / Natural Language Processing are welcome at ARR. At submission, papers must select a topic area to assist with AC and reviewer matching. The current set of areas are (in alphabetical order):
+
+Computational Social Science and Cultural Analytics
+Dialogue and Interactive Systems
+Discourse and Pragmatics
+Efficient/Low-Resource Methods for NLP
+Ethics, Bias, and Fairness
+Generation
+Human-centered NLP
+Information Extraction
+Information Retrieval and Text Mining
+Interpretability and Analysis of Models for NLP
+Language Modeling
+Linguistic Theories, Cognitive Modeling, and Psycholinguistics
+Machine Learning for NLP
+Machine Translation
+Multilingualism and Cross-Lingual NLP
+Multimodality and Language Grounding to Vision, Robotics and Beyond
+NLP Applications
+Phonology, Morphology, and Word Segmentation
+Question Answering
+Resources and Evaluation
+Semantics: Lexical and Sentence-Level
+Sentiment Analysis, Stylistic Analysis, and Argument Mining
+Speech Recognition, Text-to-Speech and Spoken Language Understanding
+Summarization
+Syntax: Tagging, Chunking and Parsing
+Theme tracks (proposed by participating publication venues and specific to those venues)
+For more information about how to choose the right area, see this page.
+
+ARR welcomes diverse types of contributions in the above areas. When making a submission at ARR, the authors can indicate one or more of the following contribution types that their submission is making:
+
+Approaches to low-resource settings
+Approaches low compute settings-efficiency
+Data resources
+Data analysis
+Model analysis & interpretability
+NLP engineering experiment
+Publicly available software and/or pre-trained models
+Position papers
+Reproduction study
+Surveys (all papers are expected to include reviews of related literature. This category is meant for the papers that go beyond that, e.g. in scope or in establishing new interdisciplinary connections)
+Theory
+Both positive and negative results for experimental studies are welcome, and have the same challenge of justifying to the program committee why this particular result is interesting and important. A negative results paper might report on non-reproducibility or non-generalizability of previously published results, their misattribution (‘right for the wrong reasons’), or present an idea that seemed great (for well-justified reasons), but didn’t work.
+
+ARR welcomes scholars from other communities who make a substantive contribution to the computational processing of language. Here are some points to keep in mind for a successful submission:
+
+Interdisciplinary submissions typically aim to introduce concepts/methods/theories from one community to the CL/NLP community.
+For machine learning application papers on areas other than language, if the authors feel that their work fits the NLP applications track (e.g. because it finds a new application for a language model), they are welcome to try to convince the reviewers and area chairs that their work should be presented in this venue.
+A good rule-of-thumb to consider whether your work is connected to a given community is to consider whether your list of references has a substantial proportion of papers from that community.
+PAPER SUBMISSION INFORMATION
+Long Papers
+Long papers must describe substantial, original, completed and unpublished work. Wherever appropriate, concrete evaluation and analysis should be included. Long papers may consist of:
+
+up to eight (8) pages of content
+unlimited extra space after the conclusion for limitations (required, see below) and optional section on ethical considerations (we recommend it to be titled ‘Ethical considerations’)
+plus unlimited pages of references
+Submissions that exceed the length requirements, or are missing a limitations section, will be desk rejected.
+
+Short Papers
+Short paper submissions must describe original and unpublished work. Please note that a short paper is not a shortened long paper. Instead, short papers should have a small, focused contribution that can be made in a few pages. Some common kinds of short papers are (non-)reproduction reports, negative results, opinion pieces, interesting application nuggets (but all these types of contributions could also be presented in long papers, given sufficient substance).
+
+Short papers may consist of:
+
+up to four (4) pages of content
+unlimited extra space after the conclusion for limitations (required, see below) and optional section on ethical considerations (we recommend it to be titled ‘Ethical considerations’)
+plus unlimited pages of references
+Submissions that exceed the length requirements, or are missing a limitations section, will be desk rejected.
+
+Instructions for Two-Way Anonymized Review
+Papers must not include authors’ names and affiliations. Furthermore, self-references that reveal the authors’ identities, e.g., “We previously showed (Smith, 1991)…” must be avoided. Instead, use citations such as “Smith previously showed (Smith, 1991)…” Papers should not refer, for further detail, to documents that are not available to the reviewers.
+
+Supplementary materials, including any links to repositories, should also be anonymized. Links to file hosting services that can track downloads, such as Dropbox, are not allowed.
+
+Submissions that violate these requirements will be desk rejected.
+
+ARR is subject to the ACL Policies for Review and Citation, which were updated in early 2024. Beginning with the February 15, 2024 ARR deadlines, there is no anonymity period or limitation on posting or discussing non-anonymous preprints while the work is under peer review. However, the new policy incentivizes anonymous submissions by special paper awards and priority in acceptance decisions for borderline papers. You select the preprint status of the submission in the submission form. If you choose the ‘binding’ non-preprint option, you commit to not preprinting until after the review cycle is over, under the penalty of desk rejection.
+
+Authorship
+The author list for submissions should include all (and only) individuals who made substantial contributions to the work presented. Each author listed on a submission to ARR will be notified of submissions and reviews. Please refer to the new ACL policy publication ethics for authorship criteria.
+
+Please notice that once the paper has been submitted, no changes to the list of authors are allowed. There are additional authorship rules for resubmissions (see below).
+
+Citation and Comparison
+Authors are expected to cite all refereed publications relevant to their submission but may be excused for not knowing about all unpublished work (especially work that has been recently posted and/or is not widely cited).
+
+In cases where a preprint has been superseded by a refereed publication, the refereed publication should be cited in addition to or instead of the preprint version.
+
+Papers (whether refereed or not) appearing less than 3 months before the submission deadline are considered contemporaneous to a submission, and authors are therefore not obliged to make detailed comparisons that require additional experimentation and/or in-depth analysis
+
+Limitations (required section)
+Authors are required to discuss the limitations of their work in a dedicated section titled “Limitations”. This section should be included at the end of the paper, before the references, and it will not count toward the page limit. This includes both, long and short papers. Papers without a limitations section will be desk rejected. Note, prior to the December 2023 cycle, this was optional.
+
+Please note that this section should not introduce new methods, analysis, or results. We reserve the right to desk reject the submissions that use this section to introduce more content that should have been part of the main paper. It can only discuss the limitations of the work presented in the main content of the paper.
+
+Reviewing Requirements
+Submitting to ARR comes with a reviewing requirement. Starting in May 2025, all authors are expected to contribute to the review process, unless an exception applies (e.g., authors new to the community, with insufficient experience, or already serving in another capacity). Papers from the teams that do not meet this requirement, and are not covered by an exception, may be desk rejected. See more details on the updated policy here.
+
+A large-scale conference is a community effort. Thousands of authors can only get quality reviews on time if they also provide them. Contributing to the reviewing effort is hence a prerequisite to receiving the same effort from other people (for each paper there are three reviews and meta-review, plus its share of the necessary work from the chairs, the tech team and other volunteers). Note that the paper may still be desk rejected for formatting or any other violation, including the neglect of review duties by some of the authors.
+
+All authors are expected to complete a registration form within 48h hours after submission deadline (e.g. before May 21 EoD AoE for May 2025 cycle, where the submission deadline is May 19). The registration link will be available in their console immediately after paper submission. They must have an updated OpenReview profile, including affiliation, semantic scholar link, dblp link, ACL anthology link, and an email address where they can receive OpenReview messages. See here for how to maximize the likelihood of well-matched review assignments.
+
+The registered authors may or may not be selected for reviewing duties, but all qualified authors are expected to contribute if needed. The reviewers are considered qualified if they have published at least (a) at least two short or long papers in main ACL events or Findings, plus (b) at least one more paper in the ACL Anthology or a major ML/AI venue. We consider publication history recorded at ACL anthology, with the following ‘main’ venues: ACL, CL, CoLing, CoNLL, EACL, EMNLP, HLT, IJCNLP / AACL, LREC, NAACL, TACL, *SEM. The major ML/AI venues we consider include AAAI, CVPR, ECCV, FAccT, ICCV, ICLR, ICML, IJCAI, JAIR, JMLR, NIPS, NeurIPS, TMLR, and TPAMI.
+
+All reviewers must familiarize themselves with the latest version of the ARR reviewer guidelines and perform the reviews on time and in line with ARR requirements. Starting from May 2025, the authors who are deemed ‘highly irresponsible’ as reviewers or chairs may become ineligible to (re-)submit their work to ARR in the subsequent ARR cycle, or commit it to the upcoming *ACL conference. More details here: https://aclrollingreview.org/incentives2025
+
+Paper Submission Process, Criteria and Template
+Submission is electronic, using the OpenReview.net platform. All long, short, and theme papers must follow the ACL Author Guidelines. Here are the paper submission form fields for your reference.
+
+ARR provides a submission checklist. The checklist is intended as a reminder to help authors improve the quality of their papers, and decrease the risk of a desk rejection.
+
+Paper submissions must use the official ACL style template, which is available here. Please follow the paper formatting guidelines general to “*ACL” conferences available here. Authors may not modify these style files or use template designed for other conferences.
+
+Submissions that do not conform to the required styles, including paper size, margin width, and font size restrictions, will be rejected without review. All of the text of the submissions (as well as camera-ready versions of papers) should be addressed exclusively to the human readers and be clearly visible to them. Submissions with prompt injections intended to manipulate generative tools will be desk rejected.
+
+Here is the current version of the review form, and here is the current version of the AC meta-review form. These forms will be re-assessed and updated periodically.
+
+Desk Rejection
+Papers can be desk-rejected for a variety of reasons, including format and anonymity violations, dual submissions, and self-plagiarism (significant overlap in content with other submissions or publications by the same authors). We provide authors with a checklist to assist with avoiding some of the common issues (the list is not exhaustive).
+
+Starting from December 2024, ARR will also enforce desk rejections for incorrect, incomplete or misleading filing of the responsible NLP checklist, and for violating the resubmissions policy (i.e. submissions that are not accompanied with either revisions in response to prior reviews, or justifications for not doing so, as described in the section on resubmissions). Starting from July 2025, papers with appendices not following the double column format (except if covered by the approved exceptions) will also be desk rejected.
+
+Note that while we do our best for the bulk of desk rejections to happen before the start of the review process, sometimes serious problems are missed at initial checks and discovered late. Hence, desk-rejections can happen at any time in the review cycle.
+
+Optional Supplementary Materials: Appendices, Software, and Data
+ARR encourages the submission of these supplementary materials to improve the reproducibility of results and to enable authors to provide additional information that does not fit in the paper. Supplementary materials may include appendices, software, or data. For example, pre-processing decisions, model parameters, feature templates, lengthy proofs or derivations, pseudocode, sample system inputs/outputs, and other details that are necessary for the exact replication of the work described in the paper can be put into appendices.
+
+However, reviewers are not required to consider material in appendices. If the pseudo-code, or derivations, or model specifications are an important part of the contribution, or if they are important for the reviewers to assess the technical correctness of the work, they should be a part of the main paper rather than appendices.
+
+Appendices should come after the references in the submitted pdf. They do not count towards the page limit. Software should be submitted as a single .tgz or .zip archive, and data as a separate single .tgz or .zip archive. Supplementary materials must be fully anonymized to preserve the two-way anonymized reviewing policy.
+
+If supplementary software is provided through a link to an online repository, it should be properly anonymized (e.g., Anonymous GitHub). Links to cloud services like Google Drive, Dropbox etc. are not acceptable, as they might track the download activity.
+
+Note that the appendices should follow the official double-column format, with the exceptions covered by the ACLPUB guidelines.

@@ -1,0 +1,42 @@
+Citations (in-text examples, ACL author-year)
+- Austin (1962)
+- Searle (1989)
+- Searle and Vanderveken (1985)
+- Schiffman (1979)
+- Steever (1998)
+- Gaston (2018)
+- Ribeiro et al. (2016)
+
+References
+Austin, J. L. 1962. How to Do Things with Words. Harvard University Press, Cambridge, MA.
+Searle, J. R. 1989. How performatives work. Linguistics and Philosophy, 12(5):535-558. https://doi.org/10.1007/BF00627773
+Searle, J. R., and Daniel Vanderveken. 1985. Speech Acts and Illocutionary Logic. In Logic, Thought and Action, pages 109-132. Springer, Dordrecht. https://doi.org/10.1007/1-4020-3167-X_5
+Schiffman, Harold F. 1979. A Reference Grammar of Spoken Kannada. Bureau of Postsecondary Education, Washington, DC.
+Steever, Sanford B. 1998. Kannada. In The Dravidian Languages, pages 194-212. Routledge, London.
+Gaston, Anne-Marie. 2018. Bharatanatyam Evolves: From Temple to Theatre and Back Again. Manohar Publishers & Distributors. https://doi.org/10.1163/9789004754010
+Ribeiro, Marco, Sameer Singh, and Carlos Guestrin. 2016. "Why Should I Trust You?": Explaining the Predictions of Any Classifier. In Proceedings of the 2016 Conference of the North American Chapter of the Association for Computational Linguistics: Demonstrations, pages 97-101. https://doi.org/10.18653/v1/N16-3020
+
+Project-specific references (non-bibliographic)
+Based on the provided source text, the document does not include a formal bibliography or "References" section. However, the text explicitly references several technical frameworks, administrative guidelines, and internal configuration files that are foundational to the project.
+
+Here is a list of the key citations and references identified within the project description:
+
+1. Technical Frameworks and Tools
+- MediaPipe Hand Landmarker: primary computer vision tool for the "Live Demo" component and real-time hand tracking.
+- MediaPipe Tasks: implementation method used within the static web app to process hand landmarks.
+- Web Technologies: standard HTML/CSS/JS used for the static web application structure.
+
+2. Academic and Procedural Guidelines
+- ACL Rolling Review (ARR) Guidelines: requirements tracked in the submission console (anonymity, limitations, formatting).
+- Responsible NLP Checklist: referenced as a requirement and incorporated into metadata and readiness checks.
+- ACL Ethics and Anonymity Policies: referenced for anonymized review, ethics disclosures, and reviewer obligations.
+
+3. Internal Configuration References
+- mushti-requirements.json: configuration data related to the "Mushti" (fist) detection.
+- movements.json: parameters for motion classification (steadiness vs. courage).
+- requirements-info.json: definitions and text for the ARR/ACL compliance checklists.
+
+4. Disclosure References
+- AI Assistance Disclosure: requirement to disclose use of generative tools for writing or coding within the Responsible NLP checklist.
+
+Note: The sources provided do not contain specific publication dates, URLs, or formal citation strings for the external tools and guidelines listed above.

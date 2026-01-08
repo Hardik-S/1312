@@ -3,6 +3,9 @@ const DEFAULT_CONFIG = {
   minSamples: 20,
   displacementThreshold: 0.08,
   cooldownMs: 2000,
+  graceWindowMs: 2000,
+  upwardThreshold: 0.06,
+  downwardThreshold: 0.06,
   labels: {
     steadiness: {
       displacementSign: "positive",
@@ -20,11 +23,51 @@ export function createMotionClassifier(config = {}) {
   let samples = [];
   let lastFiredAt = 0;
   let lastLabel = null;
+  let graceStartMs = null;
+  let graceStartY = null;
 
-  function update(landmarks, nowMs) {
+  const steadinessLabel =
+    settings.labels?.steadiness?.label || DEFAULT_CONFIG.labels.steadiness.label;
+  const courageLabel =
+    settings.labels?.courage?.label || DEFAULT_CONFIG.labels.courage.label;
+
+  function update(landmarks, nowMs, _zoneIndex = null, context = {}) {
     if (!landmarks || landmarks.length === 0) return null;
 
     const wristY = landmarks[0].y;
+    if (graceStartMs !== null && graceStartY !== null) {
+      const elapsed = nowMs - graceStartMs;
+      if (elapsed > settings.graceWindowMs) {
+        graceStartMs = null;
+        graceStartY = null;
+      } else {
+        const displacement = wristY - graceStartY;
+        if (displacement <= -settings.upwardThreshold) {
+          if (context.courageAllowed === false) {
+            return null;
+          }
+          graceStartMs = null;
+          graceStartY = null;
+          lastFiredAt = nowMs;
+          lastLabel = courageLabel;
+          return {
+            label: courageLabel,
+            confidence: Math.min(1, Math.abs(displacement) / settings.upwardThreshold)
+          };
+        }
+        if (displacement >= settings.downwardThreshold) {
+          graceStartMs = null;
+          graceStartY = null;
+          lastFiredAt = nowMs;
+          lastLabel = steadinessLabel;
+          return {
+            label: steadinessLabel,
+            confidence: Math.min(1, displacement / settings.downwardThreshold)
+          };
+        }
+      }
+      return null;
+    }
     samples.push({ y: wristY, t: nowMs });
     const cutoff = nowMs - settings.bufferMs;
     samples = samples.filter((sample) => sample.t >= cutoff);
@@ -39,10 +82,8 @@ export function createMotionClassifier(config = {}) {
 
     if (magnitude < settings.displacementThreshold) return null;
 
-    const positiveLabel =
-      settings.labels?.steadiness?.label || DEFAULT_CONFIG.labels.steadiness.label;
-    const negativeLabel =
-      settings.labels?.courage?.label || DEFAULT_CONFIG.labels.courage.label;
+    const positiveLabel = steadinessLabel;
+    const negativeLabel = courageLabel;
     const positiveSign =
       settings.labels?.steadiness?.displacementSign ||
       DEFAULT_CONFIG.labels.steadiness.displacementSign;
@@ -51,13 +92,17 @@ export function createMotionClassifier(config = {}) {
       DEFAULT_CONFIG.labels.courage.displacementSign;
 
     const positiveMeansUp = positiveSign === "negative";
-    const label = displacement > 0
+    const semanticLabel = displacement > 0
       ? positiveMeansUp
-        ? negativeLabel
-        : positiveLabel
+        ? "courage"
+        : "steadiness"
       : positiveMeansUp
-        ? positiveLabel
-        : negativeLabel;
+        ? "steadiness"
+        : "courage";
+    const label = semanticLabel === "courage" ? courageLabel : steadinessLabel;
+    if (semanticLabel === "courage" && context.courageAllowed === false) {
+      return null;
+    }
     if (label === lastLabel && nowMs - lastFiredAt < settings.cooldownMs * 1.5) {
       return null;
     }
@@ -97,7 +142,14 @@ export function createMotionClassifier(config = {}) {
       bufferMs: settings.bufferMs,
       minSamples: settings.minSamples,
       displacementThreshold: settings.displacementThreshold,
-      cooldownRemainingMs: Math.max(0, settings.cooldownMs - (nowMs - lastFiredAt))
+      cooldownRemainingMs: Math.max(0, settings.cooldownMs - (nowMs - lastFiredAt)),
+      graceWindowMs: settings.graceWindowMs,
+      upwardThreshold: settings.upwardThreshold,
+      downwardThreshold: settings.downwardThreshold,
+      graceRemainingMs:
+        graceStartMs === null
+          ? 0
+          : Math.max(0, settings.graceWindowMs - (nowMs - graceStartMs))
     };
   }
 
@@ -105,7 +157,31 @@ export function createMotionClassifier(config = {}) {
     samples = [];
     lastFiredAt = 0;
     lastLabel = null;
+    graceStartMs = null;
+    graceStartY = null;
   }
 
-  return { update, getState, getDiagnostics, reset };
+  function resetSamples() {
+    samples = [];
+  }
+
+  function startGrace(wristY, nowMs) {
+    graceStartMs = nowMs;
+    graceStartY = wristY;
+  }
+
+  function cancelGrace() {
+    graceStartMs = null;
+    graceStartY = null;
+  }
+
+  return {
+    update,
+    getState,
+    getDiagnostics,
+    reset,
+    resetSamples,
+    startGrace,
+    cancelGrace
+  };
 }

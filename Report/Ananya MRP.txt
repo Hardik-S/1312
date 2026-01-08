@@ -1,0 +1,228 @@
+When Morphology Speaks: Rethinking Explicit Performatives
+in Kannada through Austin’s Framework
+MRP Proposal
+Ananya Balike
+Supervisor: Dr. Robert Stainton
+Second Reader: Dr. David Heap
+When Morphology Speaks: Rethinking Explicit Performatives in Kannada through
+Austin’s Framework
+1. Introduction
+Objective: This project investigates whether J. L. Austin's verb-centered model of explicit
+performatives can account for Kannada utterances where morphological markers (such as –ali,
+–ōṇa, –āgadu) transparently encode illocutionary force, how these markers function as
+alternatives to performative verbs, and whether grammaticalized performativity alters the
+applicability and/or application of felicity conditions.
+Kannada is a major Dravidian language predominantly spoken in Karnataka, India by
+over 44 million native speakers. It displays highly developed agglutinative morphology with
+intricate case systems, verb agreement, and extensive suffixation (Schiffman, 1979; Steever,
+1998), making it a promising site for investigating how languages enact actions through
+grammar. J. L. Austin’s foundational work distinguishes constatives, which describe states of
+affairs, from performatives, which perform actions through speech itself (Austin, 1962; Austin,
+1979). In other words, a performative utterance’s very saying constitutes doing an act (ordering,
+promising, naming, etc.) rather than merely describing one, succeeding through felicity
+conditions of authority, sincerity, procedural correctness, and contextual appropriateness rather
+than merely through truth-value. Explicit performatives contain an unambiguous performative
+verb clearly identifying the act performed (promise, apologize, warn, etc.), with the structure “I
+(hereby) VERBPERFORMATIVE (that)…” as the paradigmatic model. Austin’s English-centered
+framework privileges verbal encoding: “I order you to leave” explicitly names the ordering
+action while “Leave!” performs it non-explicitly (or implicitly).
+Austin’s account may possibly be read as either (A) an empirical hypothesis about
+explicit performatives across languages or (B) a theoretical stipulation defining “explicit
+performative” (hereby referred to as “ExP”) in English-specific terms. This study adopts the first
+reading, treating his criteria as potentially generalizable claims refinable through typological
+evidence. Kannada presents such evidence: although lexical ExPs also occur, many Kannada
+performatives require no ExP verb but instead use morphological markers as vehicles of
+performativity, systematically signaling illocutionary role—the intended meaning or force of a
+speech act—at the type level and encoding action in morphology rather than lexical choice. This
+raises a central question: If explicit performativity can be morphologically encoded, must a verb
+still “name the action” for the utterance to qualify as explicit? Kannada suggests grammatical
+morphology can fulfill the same transparency function Austin attributes to performative verbs,
+challenging the assumption that surface-form explicitness must be verb-centered and revealing
+that some felicity conditions may be satisfied through grammatical encoding rather than relying
+solely on situational context or speaker authority. This provides an opportunity to expand explicit
+performativity beyond English-based assumptions toward a typologically broader understanding
+of how languages do things with words.
+1
+2. Background and Literature Review
+2.1 Austin’s Notion of Performative Utterances
+Austin’s theory of speech acts emerged in response to the observation that some
+utterances do not merely describe reality but actively change it when uttered under appropriate
+circumstances (Austin 1962). These are performative utterances, which perform an action
+through speaking (e.g., “I name this ship…”), achieve effects in the world because of their
+conventional force, and depend on felicity for success. It should be noted that while
+performatives are not primarily evaluated by truth conditions, Austin recognized that various
+forms of infelicity (including factual misrepresentations) can affect the success of speech acts.
+Additionally, his interest in felicity conditions extended beyond performatives to conventional
+acts more generally. Austin also introduced distinctions among illocutionary classes of
+performatives—verdictives, exercitives, commissives, expositives, and behabitives—to capture
+diverse relationships between utterance form, intention, and social authority. Performatives thus
+reveal a structural interface between linguistic form and social action. However, Austin himself
+notes that these categories are not rigid, that overlap is sometimes inevitable, and that the
+expositive and behabitive classes in particular are “messy”, potentially requiring reclassification.
+His felicity conditions can be used to determine whether a performative is successful or
+“felicitous”:
+➢ Preparatory condition (appropriate participants with authority and context)
+➢ Essential condition (the utterance must be a conventional procedure and recognized as an
+attempt to perform the act)
+➢ Sincerity condition (the speaker must have the right beliefs and intentions)
+➢ Propositional content condition (the utterance must refer to an appropriate situation)
+Within the broader category of performatives, explicit performatives are presupposed to be those
+whose surface form transparently names the act performed. For example, “I promise to be there
+at 6PM” overtly names the act being performed through a performative verb (promise), whereas
+an implicit performative (or ImP) such as “I’ll be there at 6PM,” can perform the same act
+(promising to be there at 6PM) without explicitly naming it. Even an utterance such as “Bull!”
+(in appropriate circumstances) could be treated as an ImP of warning. Crucially, while certainly
+considered performative, Austin seems to categorize the use of grammatical mood alone as ImPs
+rather than ExPs.
+Explicit performatives can be defined as: given certain circumstances, to say X is to X.
+For example, given certain circumstances (e.g. I have wronged a friend), to say “I apologize for
+my actions” is to apologize for my actions. For Austin, the strongest diagnostic for explicitness is
+the presence of a performative verb (e.g., promise, apologize, warn) in a first-person,
+present-tense, active declarative clause. The adverb hereby strengthens the connection between
+the utterance event and the action, signaling that the spoken words themselves effect the act. A
+key underlying assumption in Austin’s model is therefore that verbal semantics typically locate
+the illocutionary force. In languages like English, these conditions often rely on the naming
+2
+function of the verb, which explicitly states the type of action being enacted. This theoretical
+stance assumes that explicitness must be lexically encoded, which may not generalize
+cross-linguistically.
+2.2 Cross-Linguistic Challenges to Austin's Framework
+Austin’s model of ExPs relies on English-specific grammatical features (the first-person
+singular present indicative active) which may not be “necessarily marked in all languages” and
+creates challenges for cross-linguistic application (Austin, 1962). Austin himself acknowledges
+this limitation, noting that languages may lack a continuous present or mark performativity
+differently. Recognizing these constraints, subsequent work in illocutionary logic has
+acknowledged that such forces are realized through diverse linguistic means including “mood,
+word-order, intonation, and stress” rather than solely through verbal semantics (Searle &
+Vanderveken, 1985). Additionally, the success of many performatives depends on
+“extra-linguistic institution[s]” and culturally specific conventions rather than purely on
+linguistic form (Searle, 1989), suggesting that Austin’s verb-centered model captures only one
+possible realization of performativity. These challenges motivate examining languages like
+Kannada, where morphological mood markers may provide alternative pathways to explicit
+performativity.
+2.4 Kannada: Morphosyntax and Relevance to Performativity
+Kannada presents compelling evidence that performative force may be morphologically
+encoded rather than being verb-dependent. In Kannada, morphological markers such as the
+optative (−ali) express wishes, blessings, or desired actions; the hortative (–ōṇa) encourages
+collective or cooperative action; and the prohibitive (–āgadu) restricts or mandates behavior. In
+(1a) below, oḷḷeyadāgali explicitly performs either a blessing or a wish depending on whether the
+speaker possesses ritual or social authority (e.g., elder, priest, parent) versus an ordinary
+interlocutor. Critically, the performative force itself is encoded in –ali and recognized by all
+Kannada speakers; what varies is whether the preparatory condition (speaker authority) elevates
+the act from wish to blessing. In (1b), the same morpheme on barali performs either a wish or a
+prayer depending on the speaker’s belief system and intent (sincerity condition), though again
+the performative force remains transparent regardless. In both (2a) hōgōṇa and (2b) tinnōṇa,
+3
+(1) –ali (2) –ōṇa (3) –āgadu
+a. oḷḷeyad-āg-ali
+good-happen-OPT
+“May good (things) happen (to you)” //
+“Good luck”
+a. mane-ge hōg-ōṇa
+home-DAT go-HORT
+“Let’s go home”
+a. gaḍi dāṭ-i īja.l-āgadu
+border cross-RES.L swim.INF-PROHIB
+“One is not able/permitted to swim past the
+border/boundary”
+b. ī bēsige(-yalli) maḷe bar-ali
+this summer(-LOC) rain come-OPT
+“May there be rain this summer”
+b. indu rātri horage tinn-ōṇa
+today night outside eat-HORT
+“Let’s eat out(side) tonight”
+b. alli(-ge) hōga.l-āgadu
+there-(DAT) go.INF-PROHIB
+“One is not able/permitted to go there”
+the morpheme is used to explicitly perform a proposal for joint action that any speaker can
+felicitously utter. Unlike –ali, the illocutionary act type remains constant (proposal/suggestion)
+across speakers. However, the perlocutionary effect (the result of a speech act on the listener; in
+this case, the “strength” of the suggestion) may vary based on the speaker’s social standing or
+credibility. In (3a) ījalāgadu and (3b) hōgalāgadu, the morpheme transparently signals a
+prohibition, but the utterance achieves felicity only when spoken by someone with institutional
+or social authority (e.g., border guard, lifeguard, official). When uttered by an unauthorized
+speaker, the preparatory condition fails even though the illocutionary force remains
+grammatically explicit. This reveals that morphological explicitness can make illocutionary force
+transparent while still requiring traditional authority-based felicity conditions.
+3. Research Questions and Working Hypotheses
+This project addresses the following three research questions and working hypotheses:
+1. Can Austin’s definition of explicit performatives account for Kannada utterances in
+which performative force is not lexically anchored in a performative verb?
+➢ Working hypothesis: Austin’s model insufficiently captures performative force in
+Kannada because it presupposes that explicitness must be verbal in nature. This
+presumption limits the descriptive accuracy of speech act theory for languages
+with potential illocutionary morphology.
+2. How do Kannada morphemes such as optative –ali, hortative –ōṇa, and prohibitive
+–āgadu encode or account for illocutionary force? And what features allow these
+markers to fulfill the role traditionally attributed to performative verbs?
+➢ Working hypothesis: In Kannada, explicit performativity is frequently realized
+through morphosyntactic encoding, where suffixal mood markers signal the
+intended illocutionary action. These forms can serve the same functional role as
+performative verbs in English.
+3. Do felicity conditions operate differently when performativity is morphologically
+encoded? Specifically, could grammaticalization render certain felicity conditions
+redundant or automatically satisfied?
+➢ Working hypothesis: Some felicity conditions may be structurally encoded in
+Kannada rather than pragmatically inferred or lexically encoded. This possibility
+indicates that explicitness may not inherently be tied to lexical transparency, but
+rather to systematic formal cues accessible to interlocutors.
+Together, these hypotheses predict that Kannada morphological explicit performative data
+will require theoretical modifications to Austin’s original framework, expanding ExPs beyond
+English-derived assumptions and toward a typologically robust model of how languages can
+variably enact action through speech.
+4
+4. Methodology
+This project will use qualitative linguistic analysis to evaluate how Kannada morphology
+can directly encode explicit performativity. Data for Kannada ExPs will come from the author’s
+native-speaker intuitions, inspired by naturally occurring examples from media, interpersonal
+discourse, and ritualized contexts, ensuring both pragmatic accuracy and cross-speaker
+validation. I will systematically generate examples across different verb types and social
+contexts, testing whether morphological markers alone make illocutionary force transparent to
+competent speakers. Examples will be selected to represent prototypical uses while also probing
+boundary cases where felicity conditions may be violated. The analysis will identify
+constructions using potential ExP markers such as –ali, –ōṇa, and –āgadu, etc., compare the
+illocutionary contribution of morphology versus lexical verbs, and examine whether felicity
+conditions are satisfied through formal encoding. The findings from Kannada will then be
+evaluated against Austin’s criteria for ExPs to determine where revisions are needed to
+accommodate languages where morphology can also transparently perform the intended action.
+This project does not involve human subjects in new elicitation sessions; ethics approval is thus
+not required.
+5. Significance and Expected Contributions
+This project is expected to advance speech act theory by demonstrating that explicit
+performativity does not universally depend on verb-based naming, as assumed in Austin’s
+English-centric model. Through evidence from Kannada, the study shows that illocutionary force
+can also be morphologically encoded and that some felicity conditions may be inherently
+satisfied through morphology rather than the lexicon or pragmatics. These findings can provide a
+more typologically inclusive account of explicit performatives, contribute cross-linguistic data
+from a major but underrepresented language, and refine Austin’s theoretical framework to better
+capture the structural diversity through which speakers perform actions (do things) with words.
+6. Detailed Timeline
+December 2025 – February 2026
+Refine data collection using intuition-based and documented examples; complete draft of
+Introduction and Literature Review.
+March 2026
+Work on analyses; complete Data and Analysis draft.
+April – July 2026
+Apply feedback on all completed sections; complete Discussion and Conclusions draft.
+November 2026
+Make any required structural or theoretical revisions. Submit Final MRP.
+5
+7. References
+Austin, J. L. 1962. How to do things with words. Oxford University Press.
+Austin, J. L., Urmson, J. O., & Warnock, G. J. (1979). Performative utterances. In Philosophical
+Papers, 233–252. Clarendon Press. https://doi.org/10.1093/019283021x.003.0010
+“John Langshaw Austin”. 2012. In Stanford Encyclopedia of Philosophy.
+https://plato.stanford.edu/entries/austin-jl/
+Schiffman, Harold F. 1979. A Reference Grammar of Spoken Kannada. Washington: Bureau of
+Postsecondary Education (DHEW/OE).
+https://theswissbay.ch/pdf/Books/Linguistics/Mega%20linguistics%20pack/Dravidian/Ka
+nnada%2C%20A%20Reference%20Grammar%20of%20Spoken%20%28Schiffman.pdf
+Searle, J. R. 1989. How performatives work. In Linguistics and Philosophy, 12(5), 535–558.
+https://doi.org/10.1007/bf00627773
+Searle, J. R. & Vanderveken, D. 1985. Speech acts and illocutionary logic. In Logic, Thought
+and Action, 109–132. Springer, Dordrecht. https://doi.org/10.1007/1-4020-3167-x_5
+“Speech Acts”. 2007. In Stanford Encyclopedia of Philosophy.
+https://plato.stanford.edu/entries/speech-acts/
+Steever, Sanford B. 1998. Kannada. In The Dravidian Languages, ed. Sanford B. Steever,
+194–212. London: Routledge. https://doi.org/10.4324/9781315722580
+6
